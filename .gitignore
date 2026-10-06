@@ -1,0 +1,37 @@
+# ── Dataset & media (large binary files) ───────────────────────────────────────
+data/
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.mp4
+*.avi
+*.mov
+
+# ── Model weights ───────────────────────────────────────────────────────────────
+*.pt
+*.pth
+*.onnx
+
+# ── Python bytecode / caches ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ── Virtual environments ────────────────────────────────────────────────────────
+venv/
+env/
+.venv/
+.env/
+
+# ── Editor / IDE ────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Runtime outputs ─────────────────────────────────────────────────────────────
+outputs/
+alerts.log
+*.log
+
