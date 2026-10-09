@@ -32,20 +32,6 @@ archive/
 2. Giải nén coppy data thư mục `data/` của project
 3. Kiểm tra cấu trúc sau khi giải nén 
 
-fire-smoke-detection/
-└── data.yml
-└── data/
-    ├── train/           
-    │   ├── images/
-    │   └── labels/
-    ├── val/           
-    │   ├── images/
-    │   └── labels/
-    ├── test/            
-    │   ├── images/
-    │   └── labels/
-    ├── data.yaml
-    └── README.md
 4. Mở file data.yaml (ở project root) và thay toàn bộ nội dung bằng:
 ## Cấu hình data.yaml
 Copy từ path   đến hết ]
@@ -60,6 +46,7 @@ test: test/images
 nc: 2
 names: ['smoke', 'fire']
 ```
+Forder data với data.yml đặt cùng cấp trong fire-smoke-dectection nhé
 ## Số lượng
 - Train: 14.122 ảnh
 - Val: 3.099 ảnh
