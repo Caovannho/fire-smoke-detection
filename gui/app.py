@@ -265,8 +265,8 @@ class FireSmokeApp:
 
             # Draw bounding boxes
             for det in detections:
-                label, score, bbox = det
-                _draw_detection(frame, label, score, bbox)
+                x, y, w, h, label, score = det
+                _draw_detection(frame, x, y, w, h, label, score)
 
             # Alert system
             alerting = self._alert_system.update(detections)

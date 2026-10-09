@@ -197,7 +197,8 @@ def run(source=0, method: str = "combined", show: bool = True) -> None:
                 _draw_detection(frame, x, y, w, h, label, score)
 
             # Debug
-            print(f"[pipeline] frame {frame_count}, detections: {len(detections)}")
+            if frame_count % 30 == 0:
+                print(f"[pipeline] frame {frame_count}, detections: {len(detections)}")
 
             # Compute FPS every N frames
             frame_count += 1
