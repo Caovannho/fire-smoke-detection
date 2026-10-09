@@ -43,8 +43,11 @@ _DEFAULT_COLOR = (0, 255, 0)    # green fallback for unknown labels
 
 def load_detector(method: str = "combined"):
     """
-    Return a callable  detect(frame) -> list[tuple[str, float, tuple[int,int,int,int]]]
-    where each tuple is  (label, confidence, (x, y, w, h)).
+    Return a callable  detect(frame) -> list[tuple[int,int,int,int,str,float]]
+    where each tuple is  (x, y, w, h, label, confidence).
+
+    If the required modules are not yet implemented (ImportError), a warning
+    is printed and a no-op detector that always returns [] is returned instead.
 
     Parameters
     ----------
@@ -56,50 +59,63 @@ def load_detector(method: str = "combined"):
     ValueError
         If *method* is not one of the supported options.
     """
-    if method == "traditional":
-        from traditional import fire_detect, smoke_detect
+    try:
+        if method == "traditional":
+            from traditional import fire_detect, smoke_detect
 
-        def _traditional_detect(frame):
-            results = []
-            results.extend(fire_detect.detect(frame))
-            results.extend(smoke_detect.detect(frame))
-            return results
+            def _traditional_detect(frame):
+                results = []
+                results.extend(fire_detect.detect(frame))
+                results.extend(smoke_detect.detect(frame))
+                return results
 
-        return _traditional_detect
+            return _traditional_detect
 
-    elif method == "yolo":
-        from yolo import yolo_detect
+        elif method == "yolo":
+            from yolo import yolo_detect
 
-        return yolo_detect.detect
+            return yolo_detect.detect
 
-    elif method == "combined":
-        from traditional import fire_detect, smoke_detect
-        from yolo import yolo_detect
+        elif method == "combined":
+            from traditional import fire_detect, smoke_detect
+            from yolo import yolo_detect
 
-        def _combined_detect(frame):
-            results = []
-            results.extend(fire_detect.detect(frame))
-            results.extend(smoke_detect.detect(frame))
-            results.extend(yolo_detect.detect(frame))
-            return results
+            def _combined_detect(frame):
+                results = []
+                results.extend(fire_detect.detect(frame))
+                results.extend(smoke_detect.detect(frame))
+                results.extend(yolo_detect.detect(frame))
+                return results
 
-        return _combined_detect
+            return _combined_detect
 
-    else:
-        raise ValueError(
-            f"Unknown detection method '{method}'. "
-            "Choose from: 'traditional', 'yolo', 'combined'."
-        )
+        else:
+            raise ValueError(
+                f"Unknown detection method '{method}'. "
+                "Choose from: 'traditional', 'yolo', 'combined'."
+            )
+
+    except ImportError as e:
+        print(f"[WARN] Detector chưa có: {e}")
+        return lambda frame: []
 
 
 # ---------------------------------------------------------------------------
 # Drawing helpers
 # ---------------------------------------------------------------------------
 
-def _draw_detection(frame: np.ndarray, label: str, score: float,
-                    bbox: tuple) -> None:
-    """Draw a single bounding box with label and confidence score."""
-    x, y, w, h = bbox
+def _draw_detection(frame: np.ndarray, x: int, y: int, w: int, h: int,
+                    label: str, score: float) -> None:
+    """Draw a single bounding box with label and confidence score.
+
+    Parameters
+    ----------
+    frame : np.ndarray  BGR image to draw on (modified in-place).
+    x, y  : int         Top-left corner of the bounding box.
+    w, h  : int         Width and height of the bounding box.
+    label : str         Detection class label (e.g. "fire", "smoke").
+    score : float       Confidence score in [0, 1].
+    """
     color = _BBOX_COLOR.get(label.lower(), _DEFAULT_COLOR)
 
     # Bounding box
@@ -173,12 +189,15 @@ def run(source=0, method: str = "combined", show: bool = True) -> None:
             )
 
             # Run detection
-            detections = detector(frame)   # [(label, score, (x,y,w,h)), ...]
+            detections = detector(frame)   # [(x, y, w, h, label, score), ...]
 
             # Draw detections
             for det in detections:
-                label, score, bbox = det
-                _draw_detection(frame, label, score, bbox)
+                x, y, w, h, label, score = det
+                _draw_detection(frame, x, y, w, h, label, score)
+
+            # Debug
+            print(f"[pipeline] frame {frame_count}, detections: {len(detections)}")
 
             # Compute FPS every N frames
             frame_count += 1
