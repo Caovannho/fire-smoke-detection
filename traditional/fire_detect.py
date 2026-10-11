@@ -12,6 +12,7 @@ Lọc màu chỉ dùng H và V (S tùy chọn): khảo sát cho thấy Cr/Cb kh�
 """
 import cv2
 import numpy as np
+from traditional.preprocess import preprocess
 
 PARAMS = dict(
     h_max=35,        # H trong [0, h_max]: cam-vàng (bỏ đoạn đỏ vòng ở H ~170-179)
@@ -20,7 +21,9 @@ PARAMS = dict(
     white_v=245,       # 0 = tắt. >0: nhận thêm pixel rất sáng (V >= white_v), S thấp, nếu có quầng cam gần đó
     halo_v=100,      # độ sáng tối thiểu của quầng cam
     halo_r=15,       # bán kính (pixel) tìm quầng cam quanh lõi trắng
-    blur=0,          # kích thước Gaussian (0 = tắt), sau này thay bằng preprocess.py
+    blur=0,          # Gaussian (0 = tắt)
+    median=0,        # Median (0 = tắt)
+    clahe=0,         # cân bằng sáng CLAHE trên kênh V (0 = tắt)
     open_k=5,        # phần tử cấu trúc cho open (1 = tắt)
     close_k=5,       # phần tử cấu trúc cho close
     min_area=0.002,  # diện tích contour tối thiểu (tỉ lệ diện tích ảnh)
@@ -28,12 +31,16 @@ PARAMS = dict(
     min_ratio=0.25,  # tỉ lệ rộng/cao của bbox
     max_ratio=4.0,
     min_score=0.0,   # bỏ vùng có điểm thấp hơn mức này
+    h_min_red=180,   # 180 = tắt. Nhỏ hơn 180: thêm dải đỏ H trong [h_min_red, 179]
 )
 
 
 def color_mask(frame, p):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(hsv, np.array([0, p["s_min"], p["v_min"]]), np.array([p["h_max"], 255, 255]))
+    if p["h_min_red"] < 180:
+        red = cv2.inRange(hsv, np.array([p["h_min_red"], p["s_min"], p["v_min"]]), np.array([179, 255, 255]))
+        mask = cv2.bitwise_or(mask, red)
     if p["white_v"]:
         core = cv2.inRange(hsv, np.array([0, 0, p["white_v"]]), np.array([179, max(p["s_min"] - 1, 0), 255]))
         halo = cv2.inRange(hsv, np.array([0, p["s_min"], p["halo_v"]]), np.array([p["h_max"], 255, 255]))
@@ -53,8 +60,7 @@ def classify_fire_region(roi, params=None):
 
 def detect_fire(frame, params=None):
     p = {**PARAMS, **(params or {})}
-    if p["blur"]:
-        frame = cv2.GaussianBlur(frame, (p["blur"], p["blur"]), 0)
+    frame = preprocess(frame, p["blur"], p["median"], p["clahe"])
     mask = color_mask(frame, p)
 
     ko = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (p["open_k"], p["open_k"]))
