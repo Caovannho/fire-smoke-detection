@@ -15,10 +15,10 @@ DATA = os.path.join(ROOT, "data")
 from traditional.fire_detect import detect
 
 GRID = {
-    "v_min": [200, 220, 240],
-    "s_min": [40, 60, 80],
-    "min_area": [0.002, 0.003, 0.005],
-    "kernel": [5, 9],
+    "white_v": [0, 230, 245],
+    "open_k": [1, 3, 5],
+    "close_k": [5, 9],
+    "min_area": [0.001, 0.002],
 }
 
 if __name__ == "__main__":

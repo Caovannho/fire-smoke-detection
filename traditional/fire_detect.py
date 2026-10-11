@@ -1,13 +1,13 @@
 """Phát hiện lửa bằng xử lý ảnh truyền thống (rule-based).
 
-Cách làm: ngưỡng màu HSV (cam/vàng) -> hình thái học (open/close) -> phân tích contour (diện tích, tỉ lệ)
--> chấm điểm vùng. Độ nhấp nháy (frame differencing) sẽ thêm vào FireDetector ở bước sau.
+Cách làm: ngưỡng màu HSV (cam/vàng, tùy chọn thêm lõi trắng sáng có quầng cam) -> hình thái học (open/close)
+-> phân tích contour (diện tích, tỉ lệ) -> chấm điểm vùng. Độ nhấp nháy sẽ thêm vào FireDetector ở bước sau.
 
 Điểm vào:
-  detect_fire(frame)       trả về list (x, y, w, h, "fire", score), frame BGR 640x480
-  detect                   bí danh của detect_fire (giao diện chung của nhóm, evaluate.py dùng tên này)
+  detect_fire(frame)        trả về list (x, y, w, h, "fire", score), frame BGR 640x480
+  detect                    bí danh của detect_fire (giao diện chung của nhóm, evaluate.py dùng tên này)
   classify_fire_region(roi) điểm 0..1 cho một vùng ảnh
-  FireDetector             lớp bọc, dùng khi cần giữ trạng thái giữa các frame
+  FireDetector              lớp bọc, dùng khi cần giữ trạng thái giữa các frame
 Lọc màu chỉ dùng H và V (S tùy chọn): khảo sát cho thấy Cr/Cb không giúp thêm gì.
 """
 import cv2
@@ -17,8 +17,12 @@ PARAMS = dict(
     h_max=35,        # H trong [0, h_max]: cam-vàng (bỏ đoạn đỏ vòng ở H ~170-179)
     s_min=60,        # độ bão hòa tối thiểu (0 = tắt)
     v_min=200,       # độ sáng tối thiểu (loại pixel tối)
+    white_v=245,       # 0 = tắt. >0: nhận thêm pixel rất sáng (V >= white_v), S thấp, nếu có quầng cam gần đó
+    halo_v=100,      # độ sáng tối thiểu của quầng cam
+    halo_r=15,       # bán kính (pixel) tìm quầng cam quanh lõi trắng
     blur=0,          # kích thước Gaussian (0 = tắt), sau này thay bằng preprocess.py
-    kernel=5,        # kích thước phần tử cấu trúc cho open/close
+    open_k=5,        # phần tử cấu trúc cho open (1 = tắt)
+    close_k=5,       # phần tử cấu trúc cho close
     min_area=0.002,  # diện tích contour tối thiểu (tỉ lệ diện tích ảnh)
     max_area=0.8,    # diện tích contour tối đa
     min_ratio=0.25,  # tỉ lệ rộng/cao của bbox
@@ -29,7 +33,14 @@ PARAMS = dict(
 
 def color_mask(frame, p):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    return cv2.inRange(hsv, np.array([0, p["s_min"], p["v_min"]]), np.array([p["h_max"], 255, 255]))
+    mask = cv2.inRange(hsv, np.array([0, p["s_min"], p["v_min"]]), np.array([p["h_max"], 255, 255]))
+    if p["white_v"]:
+        core = cv2.inRange(hsv, np.array([0, 0, p["white_v"]]), np.array([179, max(p["s_min"] - 1, 0), 255]))
+        halo = cv2.inRange(hsv, np.array([0, p["s_min"], p["halo_v"]]), np.array([p["h_max"], 255, 255]))
+        r = 2 * p["halo_r"] + 1
+        halo = cv2.dilate(halo, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (r, r)))
+        mask = cv2.bitwise_or(mask, cv2.bitwise_and(core, halo))
+    return mask
 
 
 def classify_fire_region(roi, params=None):
@@ -46,9 +57,10 @@ def detect_fire(frame, params=None):
         frame = cv2.GaussianBlur(frame, (p["blur"], p["blur"]), 0)
     mask = color_mask(frame, p)
 
-    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (p["kernel"], p["kernel"]))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
+    ko = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (p["open_k"], p["open_k"]))
+    kc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (p["close_k"], p["close_k"]))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, ko)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kc)
 
     img_area = frame.shape[0] * frame.shape[1]
     out = []
