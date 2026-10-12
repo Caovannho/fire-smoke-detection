@@ -89,10 +89,15 @@ def load_detector(method: str = "combined"):
 
             return _combined_detect
 
+        elif method == "hybrid":
+            from yolo import hybrid_detect
+
+            return hybrid_detect.detect
+
         else:
             raise ValueError(
                 f"Unknown detection method '{method}'. "
-                "Choose from: 'traditional', 'yolo', 'combined'."
+                "Choose from: 'traditional', 'yolo', 'combined', 'hybrid'."
             )
 
     except ImportError as e:
@@ -238,7 +243,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--method",
-        choices=["traditional", "yolo", "combined"],
+        choices=["traditional", "yolo", "combined", "hybrid"],
         default="combined",
         help="Detection method to use. Default: combined"
     )
