@@ -5,6 +5,7 @@ Dùng: python eval/evaluate.py --split val --limit 200
 detector(frame): nhận ảnh BGR 640x480, trả về list (x, y, w, h, label, score).
 Score (phần tử thứ 6) nên phản ánh độ tin cậy, nếu không đường PR/mAP chỉ còn là một điểm.
 """
+import random
 import os
 import sys
 import csv
@@ -149,8 +150,9 @@ def evaluate_method(detector, dataset_path="data/test", iou_thr=0.3, limit=None,
         dataset_path = os.path.join(ROOT, dataset_path)
     img_dir = os.path.join(dataset_path, "images")
     lbl_dir = os.path.join(dataset_path, "labels")
-    files = sorted(f for f in glob.glob(os.path.join(img_dir, "*")) if f.lower().endswith(EXTS))[:limit]
-
+    files = sorted(f for f in glob.glob(os.path.join(img_dir, "*")) if f.lower().endswith(EXTS))
+    if limit and limit < len(files):
+        files = sorted(random.Random(0).sample(files, limit))
     tp = fp = fn = 0                  # mức bounding box
     itp = ifp = ifn = itn = 0         # mức ảnh
     none_n = none_fp = 0              # riêng ảnh "None" (nhãn rỗng)
@@ -207,6 +209,8 @@ def evaluate_method(detector, dataset_path="data/test", iou_thr=0.3, limit=None,
 def evaluate_noise(detector, noise_dir=None):
     """Số ảnh nhiễu bị báo cháy sai, tính riêng từng thư mục con của data/noise."""
     noise_dir = noise_dir or os.path.join(ROOT, "data", "noise")
+    if not os.path.isdir(noise_dir):
+        return {}
     subs = [os.path.join(noise_dir, s) for s in sorted(os.listdir(noise_dir))
             if os.path.isdir(os.path.join(noise_dir, s))] or [noise_dir]
     out = {}
