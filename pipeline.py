@@ -65,8 +65,10 @@ def load_detector(method: str = "combined"):
 
             def _traditional_detect(frame):
                 results = []
-                results.extend(fire_detect.detect(frame))
-                results.extend(smoke_detect.detect(frame))
+                if hasattr(fire_detect, "detect"):
+                    results.extend(fire_detect.detect(frame))
+                if hasattr(smoke_detect, "detect"):
+                    results.extend(smoke_detect.detect(frame))
                 return results
 
             return _traditional_detect
@@ -74,7 +76,9 @@ def load_detector(method: str = "combined"):
         elif method == "yolo":
             from yolo import yolo_detect
 
-            return yolo_detect.detect
+            if hasattr(yolo_detect, "detect"):
+                return yolo_detect.detect
+            return lambda frame: []
 
         elif method == "combined":
             from traditional import fire_detect, smoke_detect
@@ -82,9 +86,12 @@ def load_detector(method: str = "combined"):
 
             def _combined_detect(frame):
                 results = []
-                results.extend(fire_detect.detect(frame))
-                results.extend(smoke_detect.detect(frame))
-                results.extend(yolo_detect.detect(frame))
+                if hasattr(fire_detect, "detect"):
+                    results.extend(fire_detect.detect(frame))
+                if hasattr(smoke_detect, "detect"):
+                    results.extend(smoke_detect.detect(frame))
+                if hasattr(yolo_detect, "detect"):
+                    results.extend(yolo_detect.detect(frame))
                 return results
 
             return _combined_detect
