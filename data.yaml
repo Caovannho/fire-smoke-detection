@@ -1,15 +1,8 @@
-path: .
+# Dataset D-Fire
+path: ./data
 train: train/images
 val: val/images
 test: test/images
 
 nc: 2
 names: ['smoke', 'fire']
-# Classes
-names: ['smoke', 'fire']  # Replace with your actual class names
-
-# Counts
-nc: 2  # number of classes
-train_count: 14122
-val_count: 3099
-test_count: 4306

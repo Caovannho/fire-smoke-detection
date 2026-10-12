@@ -1,5 +1,7 @@
 # ── Dataset & media (large binary files) ───────────────────────────────────────
-data/
+data/*
+!data/*.md
+!data/**/.gitkeep
 *.jpg
 *.jpeg
 *.png
@@ -32,6 +34,7 @@ env/
 
 # ── Runtime outputs ─────────────────────────────────────────────────────────────
 outputs/
+runs/
 alerts.log
 *.log
 
