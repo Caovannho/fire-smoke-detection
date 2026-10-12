@@ -159,3 +159,4 @@ Toàn bộ các phương pháp được đánh giá đồng nhất trên cùng t
    - Thiết lập bộ thực nghiệm so sánh đa phương pháp hoàn chỉnh với số liệu và biểu đồ trực quan phục vụ báo cáo chung và slide thuyết trình.
 2. **Định hướng phát triển:**
    - Xuất mô hình sang định dạng **ONNX** hoặc **TensorRT** (FP16/INT8) để tăng tốc độ suy luận gấp 2-3 lần trên các thiết bị nhúng camera AI (Jetson Nano, Raspberry Pi AI Kit).
+

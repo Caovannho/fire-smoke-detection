@@ -87,3 +87,4 @@ Mỗi dòng đại diện cho một bounding box với 5 giá trị:
 1. Mỗi thành viên sau khi gán nhãn xong nén thư mục ảnh và nhãn của mình gửi cho TV4.
 2. TV4 chạy script kiểm tra định dạng nhãn (`test_labels.py`) để đảm bảo không có class ID sai (ngoài 0 và 1) và không có tọa độ vượt quá [0, 1].
 3. TV4 tổng hợp vào tập `data/` chính thức của dự án.
+

@@ -167,3 +167,4 @@ def detect(frame: np.ndarray) -> List[Tuple[int, int, int, int, str, float]]:
     if _default_hybrid is None:
         _default_hybrid = HybridDetector()
     return _default_hybrid.detect(frame)
+
