@@ -3,7 +3,7 @@ Comprehensive Model Comparison & Benchmarking Script (TV4).
 
 Evaluates and compares all detection approaches on the same benchmark test set:
     1. Traditional Fire Detector (HSV + Morphology) - TV2
-    2. Traditional Smoke Detector (MOG2 / Background Subtraction) - TV3
+    2. Traditional Smoke Detector (MOG2 + Edge/Color Heuristics) - TV3
     3. YOLOv8 Deep Learning Detector - TV4
     4. Hybrid Cascaded Detector (Candidate Filter + YOLO) - TV4
 
@@ -11,18 +11,21 @@ Outputs:
     - Printed Markdown comparison table in terminal
     - JSON summary at report/comparison_summary.json
     - Bar chart comparison at report/images/comparison_bar_chart.png
-    - Precision-Recall curves comparison at report/images/pr_curves_comparison.png
 
 Usage:
-    python eval/compare_models.py --split test --limit 200
+    python eval/compare_models.py --split test --limit 100
     python eval/compare_models.py --split val
 """
 
 import os
 import sys
+import glob
+import time
 import json
+import random
 import argparse
 from pathlib import Path
+import cv2
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -32,7 +35,119 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from eval.evaluate import evaluate_method, compute_pr, compute_iou
+from eval.evaluate import (
+    compute_iou,
+    compute_precision_recall,
+    compute_f1,
+    compute_map,
+    compute_pr,
+    match,
+    _div,
+    W, H, EXTS
+)
+
+
+def load_gt_by_class(label_path: str, target_class: int = 1):
+    """
+    Load ground truth bounding boxes.
+    target_class: 0 for smoke, 1 for fire, None for all.
+    """
+    boxes, n = [], 0
+    if os.path.exists(label_path):
+        with open(label_path, "r", encoding="utf-8") as f:
+            for line in f:
+                p = line.split()
+                if len(p) != 5:
+                    continue
+                n += 1
+                cls_id = int(p[0])
+                if target_class is None or cls_id == target_class:
+                    xc, yc, w, h = map(float, p[1:])
+                    boxes.append(((xc - w / 2) * W, (yc - h / 2) * H, w * W, h * H))
+    return boxes, n
+
+
+def evaluate_detector(
+    detector,
+    dataset_path: str = "data/test",
+    target_class: int = 1,
+    target_label: str = "fire",
+    iou_thr: float = 0.3,
+    limit: int = None,
+    warmup: int = 5,
+    raw: dict = None
+):
+    """
+    Universal evaluation on dataset_path for any detector and class.
+    """
+    if not os.path.isabs(dataset_path):
+        dataset_path = os.path.join(ROOT_DIR, dataset_path)
+    img_dir = os.path.join(dataset_path, "images")
+    lbl_dir = os.path.join(dataset_path, "labels")
+
+    files = sorted(f for f in glob.glob(os.path.join(img_dir, "*")) if f.lower().endswith(EXTS))
+    if limit and limit < len(files):
+        files = sorted(random.Random(42).sample(files, limit))
+
+    tp = fp = fn = 0
+    itp = ifp = ifn = itn = 0
+    none_n = none_fp = 0
+    times = []
+    all_preds, all_gts = [], []
+
+    for i, f in enumerate(files):
+        img = cv2.imread(f)
+        if img is None:
+            continue
+        img = cv2.resize(img, (W, H))
+
+        t = time.perf_counter()
+        dets = detector(img)
+        if i >= warmup:
+            times.append(time.perf_counter() - t)
+
+        # Filter by target label
+        if target_label is not None:
+            preds = [d for d in dets if d[4] == target_label]
+        else:
+            preds = list(dets)
+
+        name = os.path.splitext(os.path.basename(f))[0] + ".txt"
+        gts, n_lines = load_gt_by_class(os.path.join(lbl_dir, name), target_class=target_class)
+
+        all_preds.append(preds)
+        all_gts.append(gts)
+
+        a, b, c = match(preds, gts, iou_thr)
+        tp, fp, fn = tp + a, fp + b, fn + c
+
+        has_gt, has_pred = bool(gts), bool(preds)
+        itp += has_gt and has_pred
+        ifn += has_gt and not has_pred
+        ifp += (not has_gt) and has_pred
+        itn += (not has_gt) and not has_pred
+
+        if n_lines == 0:
+            none_n += 1
+            none_fp += has_pred
+
+    p, r = compute_precision_recall(tp, fp, fn)
+    if raw is not None:
+        raw.update(predictions=all_preds, ground_truth=all_gts)
+
+    res = {
+        "n_images": len(files),
+        "box_precision": p,
+        "box_recall": r,
+        "box_f1": compute_f1(p, r),
+        "img_precision": _div(itp, itp + ifp),
+        "img_recall": _div(itp, itp + ifn),
+        "img_fpr": _div(ifp, ifp + itn),
+        "none_fpr": _div(none_fp, none_n),
+        "fps": _div(len(times), sum(times)),
+    }
+    res.update(compute_map(all_preds, all_gts))
+    return res
 
 
 def plot_comparison_charts(results: dict, output_dir: Path):
@@ -50,7 +165,7 @@ def plot_comparison_charts(results: dict, output_dir: Path):
         ("fps", "Tốc độ (FPS)", "purple"),
     ]
 
-    fig, axes = plt.subplots(1, len(metrics_to_plot), figsize=(18, 5))
+    fig, axes = plt.subplots(1, len(metrics_to_plot), figsize=(19, 5))
     fig.suptitle("So sánh hiệu năng giữa các phương pháp phát hiện Lửa & Khói", fontsize=14, fontweight="bold")
 
     for idx, (metric_key, title, color) in enumerate(metrics_to_plot):
@@ -60,14 +175,12 @@ def plot_comparison_charts(results: dict, output_dir: Path):
         ax.set_title(title, fontsize=11, fontweight="bold")
         ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-        # Set appropriate y-limits
         if metric_key != "fps":
             ax.set_ylim(0, 1.05)
         else:
             max_fps = max(values) if values else 30
             ax.set_ylim(0, max(30, max_fps * 1.2))
 
-        # Add data labels on top of bars
         for bar in bars:
             height = bar.get_height()
             label_text = f"{height:.2f}" if metric_key != "fps" else f"{height:.1f}"
@@ -76,10 +189,10 @@ def plot_comparison_charts(results: dict, output_dir: Path):
                 xy=(bar.get_x() + bar.get_width() / 2, height),
                 xytext=(0, 3),
                 textcoords="offset points",
-                ha="center", va="bottom", fontsize=9, fontweight="bold"
+                ha="center", va="bottom", fontsize=8.5, fontweight="bold"
             )
 
-        ax.tick_params(axis="x", rotation=25)
+        ax.tick_params(axis="x", rotation=20, labelsize=9)
 
     plt.tight_layout()
     chart_path = output_dir / "comparison_bar_chart.png"
@@ -101,12 +214,12 @@ def print_markdown_table(results: dict):
         "FPS (Tốc độ)"
     ]
 
-    print("\n" + "=" * 95)
-    print("📊 BẢNG TỔNG HỢP SO SÁNH CÁC PHƯƠNG PHÁP")
-    print("=" * 95)
+    print("\n" + "=" * 100)
+    print("📊 BẢNG TỔNG HỢP SO SÁNH CÁC PHƯƠNG PHÁP (TV1, TV2, TV3, TV4)")
+    print("=" * 100)
 
-    row_format = "| {:<20} | {:<13} | {:<10} | {:<7} | {:<22} | {:<7} | {:<7} | {:<11} |"
-    divider = "|:" + "-" * 20 + ":|:" + "-" * 13 + ":|:" + "-" * 10 + ":|:" + "-" * 7 + ":|:" + "-" * 22 + ":|:" + "-" * 7 + ":|:" + "-" * 7 + ":|:" + "-" * 11 + ":|"
+    row_format = "| {:<24} | {:<13} | {:<10} | {:<7} | {:<22} | {:<7} | {:<7} | {:<11} |"
+    divider = "|:" + "-" * 24 + ":|:" + "-" * 13 + ":|:" + "-" * 10 + ":|:" + "-" * 7 + ":|:" + "-" * 22 + ":|:" + "-" * 7 + ":|:" + "-" * 7 + ":|:" + "-" * 11 + ":|"
 
     print(row_format.format(*headers))
     print(divider)
@@ -124,7 +237,7 @@ def print_markdown_table(results: dict):
         ]
         print(row_format.format(*row))
 
-    print("=" * 95 + "\n")
+    print("=" * 100 + "\n")
 
 
 def run_benchmark(split: str = "val", limit: int = None, iou_thr: float = 0.3):
@@ -137,41 +250,48 @@ def run_benchmark(split: str = "val", limit: int = None, iou_thr: float = 0.3):
         return
 
     results = {}
-    raw_data = {}
 
-    # 1. Truyền thống: Lửa (HSV) - TV2
+    # 1. Truyền thống Lửa (HSV) - TV2
     try:
         from traditional.fire_detect import detect as fire_detect
-        print(f"\n[1/4] Đang đánh giá: Truyền thống Lửa (HSV)...")
-        raw_fire = {}
-        results["Truyền thống (Lửa)"] = evaluate_method(
-            fire_detect, dataset_path=dataset_path, iou_thr=iou_thr, limit=limit, raw=raw_fire
+        print(f"\n[1/4] Đang đánh giá: Truyền thống Lửa (HSV) - TV2...")
+        results["Truyền thống Lửa (TV2)"] = evaluate_detector(
+            fire_detect, dataset_path=dataset_path, target_class=1, target_label="fire",
+            iou_thr=iou_thr, limit=limit
         )
-        raw_data["Truyền thống (Lửa)"] = raw_fire
     except Exception as e:
         print(f"[Bỏ qua] Truyền thống Lửa gặp lỗi: {e}")
 
-    # 2. YOLOv8 - TV4
+    # 2. Truyền thống Khói (MOG2) - TV3
+    try:
+        from traditional.smoke_detect import detect as smoke_detect
+        print(f"\n[2/4] Đang đánh giá: Truyền thống Khói (MOG2) - TV3...")
+        results["Truyền thống Khói (TV3)"] = evaluate_detector(
+            smoke_detect, dataset_path=dataset_path, target_class=0, target_label="smoke",
+            iou_thr=iou_thr, limit=limit
+        )
+    except Exception as e:
+        print(f"[Bỏ qua] Truyền thống Khói gặp lỗi: {e}")
+
+    # 3. YOLOv8 Deep Learning - TV4
     try:
         from yolo.yolo_detect import detect as yolo_detect
-        print(f"\n[2/4] Đang đánh giá: YOLOv8 Deep Learning...")
-        raw_yolo = {}
-        results["YOLOv8"] = evaluate_method(
-            yolo_detect, dataset_path=dataset_path, iou_thr=iou_thr, limit=limit, raw=raw_yolo
+        print(f"\n[3/4] Đang đánh giá: YOLOv8 Deep Learning (Lửa) - TV4...")
+        results["YOLOv8 Lửa (TV4)"] = evaluate_detector(
+            yolo_detect, dataset_path=dataset_path, target_class=1, target_label="fire",
+            iou_thr=iou_thr, limit=limit
         )
-        raw_data["YOLOv8"] = raw_yolo
     except Exception as e:
         print(f"[Bỏ qua] YOLOv8 gặp lỗi: {e}")
 
-    # 3. Hybrid - TV4
+    # 4. Phương pháp kết hợp Hybrid - TV4
     try:
         from yolo.hybrid_detect import detect as hybrid_detect
-        print(f"\n[3/4] Đang đánh giá: Phương pháp Kết hợp Hybrid...")
-        raw_hybrid = {}
-        results["Kết hợp (Hybrid)"] = evaluate_method(
-            hybrid_detect, dataset_path=dataset_path, iou_thr=iou_thr, limit=limit, raw=raw_hybrid
+        print(f"\n[4/4] Đang đánh giá: Kết hợp Hybrid (Lọc nhanh + YOLO) - TV4...")
+        results["Kết hợp Hybrid (TV4)"] = evaluate_detector(
+            hybrid_detect, dataset_path=dataset_path, target_class=1, target_label="fire",
+            iou_thr=iou_thr, limit=limit
         )
-        raw_data["Kết hợp (Hybrid)"] = raw_hybrid
     except Exception as e:
         print(f"[Bỏ qua] Hybrid gặp lỗi: {e}")
 
@@ -179,7 +299,7 @@ def run_benchmark(split: str = "val", limit: int = None, iou_thr: float = 0.3):
         print("Không có phương pháp nào chạy thành công.")
         return
 
-    # In bảng markdown
+    # In bảng markdown ra màn hình
     print_markdown_table(results)
 
     # Lưu kết quả JSON
@@ -193,16 +313,15 @@ def run_benchmark(split: str = "val", limit: int = None, iou_thr: float = 0.3):
         json.dump(results, f, indent=2, ensure_ascii=False)
     print(f"[compare_models] Đã lưu kết quả JSON tại: {json_path}")
 
-    # Vẽ biểu đồ so sánh
+    # Vẽ biểu đồ đối sánh
     plot_comparison_charts(results, images_dir)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="So sánh tất cả các phương pháp phát hiện")
+    parser = argparse.ArgumentParser(description="So sánh tất cả các phương pháp phát hiện (TV1-TV4)")
     parser.add_argument("--split", default="val", choices=["train", "val", "test"], help="Tập dữ liệu đánh giá")
     parser.add_argument("--limit", type=int, default=None, help="Giới hạn số ảnh để test nhanh")
     parser.add_argument("--iou", type=float, default=0.3, help="Ngưỡng IoU")
     args = parser.parse_args()
 
     run_benchmark(split=args.split, limit=args.limit, iou_thr=args.iou)
-
