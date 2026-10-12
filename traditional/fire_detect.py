@@ -87,12 +87,46 @@ detect = detect_fire
 
 
 class FireDetector:
-    """Bộ phát hiện theo từng frame. Hiện chưa lưu trạng thái; phần nhấp nháy sẽ thêm ở đây."""
+    """Bộ phát hiện giữ trạng thái giữa các frame (video, camera cố định).
 
-    def __init__(self, params=None):
+    flicker_min = 0 (mặc định): không lọc, kết quả y hệt detect_fire.
+    flicker_min > 0: sau `warmup` frame, bỏ vùng có độ nhấp nháy thấp hơn ngưỡng.
+    Độ nhấp nháy của vùng = tỉ lệ pixel trong bbox mà mặt nạ màu đổi giữa hai frame liền nhau,
+    lấy trung bình trượt với hệ số alpha.
+    """
+
+    def __init__(self, params=None, flicker_min=0.0, warmup=5, alpha=0.3):
         self.params = params
+        self.flicker_min = flicker_min
+        self.warmup = warmup
+        self.alpha = alpha
+        self.reset()
+
+    def reset(self):
+        """Gọi khi đổi nguồn video."""
+        self.prev = None
+        self.act = None
+        self.n = 0
+
+    def flicker(self, box):
+        if self.act is None:
+            return 0.0
+        x, y, w, h = box[:4]
+        return float(self.act[y:y + h, x:x + w].mean())
 
     def detect(self, frame):
-        return detect_fire(frame, self.params)
+        p = {**PARAMS, **(self.params or {})}
+        dets = detect_fire(frame, self.params)
+        mask = color_mask(preprocess(frame, p["blur"], p["median"], p["clahe"]), p)
+        if self.prev is not None and self.prev.shape != mask.shape:
+            self.reset()
+        if self.prev is not None:
+            change = cv2.bitwise_xor(mask, self.prev).astype(np.float32) / 255.0
+            self.act = change if self.act is None else (1 - self.alpha) * self.act + self.alpha * change
+        self.prev = mask
+        self.n += 1
+        if self.flicker_min <= 0 or self.n <= self.warmup:
+            return dets
+        return [d for d in dets if self.flicker(d) >= self.flicker_min]
 
     __call__ = detect
