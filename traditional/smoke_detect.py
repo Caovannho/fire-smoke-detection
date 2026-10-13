@@ -46,9 +46,6 @@ except (ImportError, ModuleNotFoundError, AttributeError):
     _DEFAULT_HSV_LOWER = [0, 0, 75]
     _DEFAULT_HSV_UPPER = [180, 55, 230]
 
-# ---------------------------------------------------------------------------
-# BẢNG THAM SỐ TOÀN CỤC (PARAMS) - Đã tối ưu hóa cho Pipeline thực tế
-# ---------------------------------------------------------------------------
 PARAMS: Dict[str, Any] = dict(
     # --- Khói xám / trắng / ánh vàng nhạt (HSV) ---
     h_min=_DEFAULT_HSV_LOWER[0],
