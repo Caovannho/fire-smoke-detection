@@ -2,8 +2,11 @@
 Rule-based smoke detection using traditional computer vision techniques.
 
 Phương pháp áp dụng:
-    1. HSV thresholding: Lọc màu khói trắng/xám và tùy chọn khói đen đặc.
-    2. Background subtraction (MOG2): Cô lập các vùng chuyển động (tùy chọn bật/tắt).
+    1. HSV thresholding: Lọc vùng màu khói (xám/trắng nhạt, vàng xám, tùy chọn khói đen).
+    2. Xác thực chuyển động theo vùng (Candidate Motion Validation):
+       - Tránh lỗi băm nát khối khói của phép `bitwise_and` truyền thống.
+       - Tìm ứng viên từ mặt nạ màu -> kiểm tra tỉ lệ chuyển động (MOG2) trong khối đó.
+       - Loại bỏ hoàn toàn vật thể tĩnh (tường, bàn ghế, màn hình) sau 1-2 frame.
     3. Phân tích hình thái học (Morphology): Lọc nhiễu đốm nhỏ và làm liền khối khói.
     4. Đánh giá mật độ cạnh (Edge Density): Tính Canny bên trong contour khói (khói mờ viền).
     5. Đánh giá hướng bay lên (Upward Motion): Theo dõi tọa độ centroid giữa các frame.
@@ -40,53 +43,67 @@ except (ImportError, ModuleNotFoundError, AttributeError):
         "[smoke_detect] Không tìm thấy config.py – sử dụng ngưỡng HSV mặc định.",
         stacklevel=2,
     )
-    _DEFAULT_HSV_LOWER = [0, 0, 90]
-    _DEFAULT_HSV_UPPER = [180, 35, 220]
+    _DEFAULT_HSV_LOWER = [0, 0, 75]
+    _DEFAULT_HSV_UPPER = [180, 55, 230]
 
+# ---------------------------------------------------------------------------
+# BẢNG THAM SỐ TOÀN CỤC (PARAMS) - Đã tối ưu hóa cho Pipeline thực tế
+# ---------------------------------------------------------------------------
 PARAMS: Dict[str, Any] = dict(
+    # --- Khói xám / trắng / ánh vàng nhạt (HSV) ---
     h_min=_DEFAULT_HSV_LOWER[0],
     h_max=_DEFAULT_HSV_UPPER[0],
     s_min=_DEFAULT_HSV_LOWER[1],
-    s_max=_DEFAULT_HSV_UPPER[1],
-    v_min=_DEFAULT_HSV_LOWER[2],
-    v_max=_DEFAULT_HSV_UPPER[2],
+    # Mở rộng s_max lên 55 để bắt khói dưới ánh đèn vàng/nắng mà không bị cắt
+    s_max=max(_DEFAULT_HSV_UPPER[1], 55),
+    # Hạ v_min xuống 75 để bắt khói dày hoặc vùng thiếu sáng
+    v_min=min(_DEFAULT_HSV_LOWER[2], 75),
+    v_max=235,
 
+    # --- Hỗ trợ khói đen / khói tối màu (tùy chọn) ---
+    enable_black_smoke=False, # Bật khi cần phát hiện cháy dầu/cao su
+    black_s_max=45,           # Độ bão hòa thấp cho khói đen
+    black_v_min=20,           # Tránh pixel tối đen tuyệt đối
+    black_v_max=75,           # Độ sáng tối đa của khói đen
 
-    enable_black_smoke=False, # Mặc định tắt để tránh nhầm nền tối; bật khi cần phát hiện cháy dầu/cao su
-    black_s_max=40,          # Độ bão hòa thấp cho khói đen
-    black_v_min=20,          # Tránh pixel tối đen tuyệt đối
-    black_v_max=75,          # Độ sáng tối đa của khói đen
+    # --- Hình thái học (Morphology) ---
+    open_k=5,                 # Kernel size phép Mở (loại bỏ chấm nhiễu nhỏ)
+    close_k=11,               # Kernel size phép Đóng (làm liền khối khói đầy đặn)
 
-    open_k=5,                # Kernel size phép Mở (loại bỏ chấm nhiễu nhỏ)
-    close_k=9,               # Kernel size phép Đóng (nối các mảng khói rời rạc)
+    # --- Lọc Contour (Diện tích & Tỉ lệ) ---
+    min_area=600,             # Hạ từ 1200 xuống 600 để bắt khói sớm từ xa
+    max_area=250000,          # Diện tích tối đa (tránh nhầm nền trời toàn khung hình)
+    min_ratio=0.2,            # Tỉ lệ w/h tối thiểu
+    max_ratio=5.0,            # Tỉ lệ w/h tối đa
 
-    min_area=1200,           # Diện tích tối thiểu (pixel trên ảnh 640x480)
-    max_area=240000,         # Diện tích tối đa (tránh nhầm nền trời toàn khung hình)
-    min_ratio=0.2,           # Tỉ lệ w/h tối thiểu
-    max_ratio=5.0,           # Tỉ lệ w/h tối đa
+    # --- Đánh giá mật độ cạnh (Edge Density) ---
+    # Nới lỏng lên 0.22 vì khói mờ trong suốt thường để lộ hoa văn nền phía sau
+    max_edge_density=0.22,
+    canny_thresh1=40,
+    canny_thresh2=120,
 
-    max_edge_density=0.14,   # Khói có viền mờ -> mật độ cạnh trong contour thấp
-    canny_thresh1=50,
-    canny_thresh2=150,
+    # --- Trừ nền & Chuyển động (Motion Validation) ---
+    use_bg_sub=True,          # Bật trừ nền khi chạy video/webcam; đặt False khi test ảnh tĩnh
+    bg_history=500,           # Lịch sử MOG2
+    bg_var_threshold=40,      # Ngưỡng variance MOG2
+    bg_learning_rate=0.003,   # Tốc độ học nền chậm: Tránh MOG2 nuốt chửng khói vào nền
+    min_motion_ratio=0.015,   # Tối thiểu 1.5% diện tích ứng viên có chuyển động
+    check_upward=True,        # Kiểm tra xu hướng khói bốc lên
+    upward_tolerance=45,      # Dung sai pixel cho chuyển động bay lên / tản ra
 
-    use_bg_sub=True,         # Đặt False khi đánh giá trên tập ảnh tĩnh độc lập (eval/evaluate.py)
-    bg_history=500,          # Lịch sử MOG2
-    bg_var_threshold=50,     # Ngưỡng variance MOG2
-    bg_detect_shadows=False,
-    check_upward=True,       # Kiểm tra xu hướng bay lên
-    upward_tolerance=35,     # Dung sai pixel cho chuyển động bay lên
-
-    min_score=0.15,          # Bỏ các ứng viên có score thấp hơn ngưỡng này
+    # --- Điểm tin cậy tối thiểu ---
+    min_score=0.15,           # Bỏ các ứng viên có score thấp hơn ngưỡng này
 )
-
-
 
 def color_mask(frame: np.ndarray, p: Dict[str, Any]) -> np.ndarray:
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # 1. Khói trắng / xám nhạt / vàng xám
     lower_white = np.array([p["h_min"], p["s_min"], p["v_min"]], dtype=np.uint8)
     upper_white = np.array([p["h_max"], p["s_max"], p["v_max"]], dtype=np.uint8)
     mask_white = cv2.inRange(hsv, lower_white, upper_white)
 
+    # 2. Khói đen (tùy chọn)
     if p.get("enable_black_smoke", False):
         lower_black = np.array([0, 0, p["black_v_min"]], dtype=np.uint8)
         upper_black = np.array([180, p["black_s_max"], p["black_v_max"]], dtype=np.uint8)
@@ -95,6 +112,7 @@ def color_mask(frame: np.ndarray, p: Dict[str, Any]) -> np.ndarray:
 
     return mask_white
 
+
 def compute_contour_edge_density(
     gray: np.ndarray,
     contour: np.ndarray,
@@ -102,12 +120,14 @@ def compute_contour_edge_density(
     y: int,
     w: int,
     h: int,
-    canny_t1: int = 50,
-    canny_t2: int = 150,
+    canny_t1: int = 40,
+    canny_t2: int = 120,
 ) -> float:
     roi_gray = gray[y : y + h, x : x + w]
     if roi_gray.size == 0:
         return 1.0
+
+    # Tạo mask cục bộ cho ROI chỉ lấy phần trong contour
     cnt_mask = np.zeros((h, w), dtype=np.uint8)
     shifted_cnt = contour - [x, y]
     cv2.drawContours(cnt_mask, [shifted_cnt], -1, 255, thickness=-1)
@@ -116,12 +136,15 @@ def compute_contour_edge_density(
     if cnt_area == 0:
         return 1.0
 
+    # Phát hiện cạnh trong ROI
     edges = cv2.Canny(roi_gray, canny_t1, canny_t2)
 
+    # Chỉ đếm số pixel cạnh nằm bên trong contour
     edges_in_contour = cv2.bitwise_and(edges, cnt_mask)
     edge_pixels = cv2.countNonZero(edges_in_contour)
 
     return float(edge_pixels) / float(cnt_area)
+
 
 def classify_smoke_region(roi: np.ndarray, params: Dict[str, Any] | None = None) -> float:
     """Chấm điểm độ giống khói của một vùng ảnh (0.0 đến 1.0)."""
@@ -141,15 +164,17 @@ class SmokeDetector:
         self._bg_sub = cv2.createBackgroundSubtractorMOG2(
             history=p["bg_history"],
             varThreshold=p["bg_var_threshold"],
-            detectShadows=p["bg_detect_shadows"],
+            detectShadows=False,
         )
         self._prev_centroids: List[Tuple[int, int]] = []
 
     def _is_rising_or_spreading(
-        self, cx: int, cy: int, tolerance: int = 35
+        self, cx: int, cy: int, tolerance: int = 45
     ) -> bool:
         if not self._prev_centroids:
             return True
+
+        # Tìm centroid gần nhất trong frame trước
         best_dist = float("inf")
         best_prev_cy = cy
         for pcx, pcy in self._prev_centroids:
@@ -171,30 +196,29 @@ class SmokeDetector:
         frame_area = float(h_frame * w_frame)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # 1. Lọc ngưỡng màu HSV
+        # 1. Trích xuất mặt nạ màu khói (HSV)
         hsv_m = color_mask(frame, p)
 
-        # 2. Xử lý chuyển động (Background Subtraction)
+        # 2. Cập nhật nền MOG2 với tốc độ học được kiểm soát
+        fg_m = None
         if p["use_bg_sub"]:
-            fg_raw = self._bg_sub.apply(frame)
-            _, fg_m = cv2.threshold(fg_raw, 200, 255, cv2.THRESH_BINARY)
-            combined_m = cv2.bitwise_and(hsv_m, fg_m)
-        else:
-            # Chế độ ảnh tĩnh: Không dùng trừ nền
-            combined_m = hsv_m
+            # Dùng learningRate nhỏ để MOG2 không nuốt khói quá nhanh
+            lr = p.get("bg_learning_rate", 0.003)
+            fg_raw = self._bg_sub.apply(frame, learningRate=lr)
+            # Ngưỡng nhị phân hóa chuyển động mềm (150 thay vì 200)
+            _, fg_m = cv2.threshold(fg_raw, 150, 255, cv2.THRESH_BINARY)
 
-        # 3. Phân tích hình thái học (Morphology)
+        # 3. Phân tích hình thái học TRÊN MẶT NẠ MÀU để giữ nguyên hình khối khói
         k_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (p["open_k"], p["open_k"]))
         k_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (p["close_k"], p["close_k"]))
 
-        cleaned_m = cv2.morphologyEx(combined_m, cv2.MORPH_OPEN, k_open, iterations=2)
-        cleaned_m = cv2.morphologyEx(cleaned_m, cv2.MORPH_CLOSE, k_close, iterations=3)
-        cleaned_m = cv2.GaussianBlur(cleaned_m, (5, 5), 0)
-        _, final_mask = cv2.threshold(cleaned_m, 127, 255, cv2.THRESH_BINARY)
+        cleaned_m = cv2.morphologyEx(hsv_m, cv2.MORPH_OPEN, k_open, iterations=1)
+        cleaned_m = cv2.morphologyEx(cleaned_m, cv2.MORPH_CLOSE, k_close, iterations=2)
+        _, candidate_mask = cv2.threshold(cleaned_m, 127, 255, cv2.THRESH_BINARY)
 
-        # 4. Tìm kiếm Contour ứng viên
+        # 4. Tìm kiếm các khối ứng viên
         contours, _ = cv2.findContours(
-            final_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            candidate_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
 
         results: List[Tuple[int, int, int, int, str, float]] = []
@@ -210,14 +234,31 @@ class SmokeDetector:
             if aspect > p["max_ratio"] or (w / h) < p["min_ratio"]:
                 continue
 
-            # 5. Đánh giá mật độ cạnh Canny bên trong contour
+            # 5. Xác thực chuyển động (Region-Level Motion Verification)
+            motion_ratio = 1.0
+            if p["use_bg_sub"] and fg_m is not None:
+                # Tạo mask riêng cho contour này để đếm số pixel chuyển động
+                cnt_mask = np.zeros((h, w), dtype=np.uint8)
+                shifted_cnt = cnt - [x, y]
+                cv2.drawContours(cnt_mask, [shifted_cnt], -1, 255, thickness=-1)
+                
+                # Cắt ROI chuyển động tương ứng
+                roi_fg = fg_m[y : y + h, x : x + w]
+                moving_pixels = cv2.countNonZero(cv2.bitwise_and(cnt_mask, roi_fg))
+                motion_ratio = float(moving_pixels) / (area + 1e-6)
+
+                # Nếu khối hoàn toàn không chuyển động (vật thể tĩnh như tường, bàn) -> Loại bỏ!
+                if motion_ratio < p["min_motion_ratio"]:
+                    continue
+
+            # 6. Đánh giá mật độ cạnh Canny bên trong contour
             edge_dens = compute_contour_edge_density(
                 gray, cnt, x, y, w, h, p["canny_thresh1"], p["canny_thresh2"]
             )
             if edge_dens > p["max_edge_density"]:
-                continue  # Bỏ qua nếu có nhiều cạnh sắc (vật thể rắn)
+                continue  # Bỏ qua nếu có quá nhiều cạnh sắc nét (vật thể rắn)
 
-            # 6. Đánh giá chuyển động bốc lên
+            # 7. Đánh giá xu hướng bốc lên / tản ra
             cx, cy = x + w // 2, y + h // 2
             is_rising = True
             if p["use_bg_sub"] and p["check_upward"]:
@@ -225,12 +266,13 @@ class SmokeDetector:
 
             current_centroids.append((cx, cy))
 
-            # 7. Tính Score tổng hợp
-            area_score = min((area / frame_area) * 10.0, 0.4)
+            # 8. Tính Điểm tin cậy (Confidence Score) cân bằng và mượt mà
+            area_score = min((area / frame_area) * 8.0, 0.35)
             edge_score = max(0.0, (1.0 - edge_dens / p["max_edge_density"])) * 0.35
-            motion_score = 0.25 if is_rising else 0.0
+            motion_score = min(motion_ratio * 4.0, 0.20) if p["use_bg_sub"] else 0.20
+            rising_bonus = 0.10 if is_rising else 0.0
 
-            total_score = round(float(np.clip(area_score + edge_score + motion_score, 0.0, 1.0)), 4)
+            total_score = round(float(np.clip(area_score + edge_score + motion_score + rising_bonus, 0.0, 1.0)), 4)
 
             if total_score >= p["min_score"]:
                 results.append((int(x), int(y), int(w), int(h), "smoke", total_score))
@@ -239,11 +281,13 @@ class SmokeDetector:
         return results
 
     __call__ = detect
+
 _detector = SmokeDetector()
 
+
 def reset() -> None:
-    """Reset trạng thái bộ phát hiện singleton (gọi khi đổi nguồn video)."""
     _detector.reset()
+
 
 def detect_smoke(
     frame: np.ndarray, params: Dict[str, Any] | None = None
@@ -255,6 +299,8 @@ def detect_smoke(
         print(f"[smoke_detect] Lỗi khi xử lý frame: {exc}", file=sys.stderr)
         return []
 
+
+# Bí danh chuẩn theo giao diện chung của nhóm
 detect = detect_smoke
 
 if __name__ == "__main__":
