@@ -92,6 +92,7 @@ PARAMS: Dict[str, Any] = dict(
     min_score=0.15,           # Bỏ các ứng viên có score thấp hơn ngưỡng này
 )
 
+
 def color_mask(frame: np.ndarray, p: Dict[str, Any]) -> np.ndarray:
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -150,6 +151,7 @@ def classify_smoke_region(roi: np.ndarray, params: Dict[str, Any] | None = None)
     p = {**PARAMS, **(params or {})}
     mask = color_mask(roi, p)
     return float(cv2.countNonZero(mask)) / float(roi.shape[0] * roi.shape[1])
+
 
 class SmokeDetector:
     def __init__(self, params: Dict[str, Any] | None = None) -> None:
@@ -238,7 +240,7 @@ class SmokeDetector:
                 cnt_mask = np.zeros((h, w), dtype=np.uint8)
                 shifted_cnt = cnt - [x, y]
                 cv2.drawContours(cnt_mask, [shifted_cnt], -1, 255, thickness=-1)
-                
+
                 # Cắt ROI chuyển động tương ứng
                 roi_fg = fg_m[y : y + h, x : x + w]
                 moving_pixels = cv2.countNonZero(cv2.bitwise_and(cnt_mask, roi_fg))
@@ -279,6 +281,10 @@ class SmokeDetector:
 
     __call__ = detect
 
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Module-level stateful detector instance
+# ═══════════════════════════════════════════════════════════════════════════
 _detector = SmokeDetector()
 
 
@@ -300,6 +306,10 @@ def detect_smoke(
 # Bí danh chuẩn theo giao diện chung của nhóm
 detect = detect_smoke
 
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Chạy standalone – demo nhanh với webcam hoặc video
+# ═══════════════════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     import argparse
 
