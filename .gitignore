@@ -38,3 +38,13 @@ runs/
 alerts.log
 *.log
 
+
+# TV1: keep datasets, training outputs and weights local
+dataset/
+datasets/
+data/
+*.zip
+yolo/runs/
+yolo/weights/
+wandb/
+*.pyc
