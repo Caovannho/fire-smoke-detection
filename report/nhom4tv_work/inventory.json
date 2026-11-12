@@ -1,0 +1,236 @@
+{
+  "figures": [
+    {
+      "number": 1,
+      "key": "morphology",
+      "title": "Minh họa tác dụng của opening và closing trên mặt nạ tổng hợp"
+    },
+    {
+      "number": 2,
+      "key": "yolo_arch",
+      "title": "Các tầng chức năng của mô hình YOLOv8 trong ứng dụng"
+    },
+    {
+      "number": 3,
+      "key": "iou",
+      "title": "Quan hệ giữa hai hộp bao và vùng giao nhau"
+    },
+    {
+      "number": 4,
+      "key": "architecture",
+      "title": "Kiến trúc chức năng và trách nhiệm của bốn thành viên"
+    },
+    {
+      "number": 5,
+      "key": "modes",
+      "title": "Phân biệt Traditional YOLO Combined và Hybrid"
+    },
+    {
+      "number": 6,
+      "key": "letterbox",
+      "title": "Letterbox và ánh xạ hộp bao từ ảnh xử lý về ảnh gốc"
+    },
+    {
+      "number": 7,
+      "key": "lifecycle",
+      "title": "Vòng đời phiên xử lý và điều kiện chuyển trạng thái"
+    },
+    {
+      "number": 8,
+      "key": "fire_flow",
+      "title": "Các bước phát hiện lửa truyền thống của TV2"
+    },
+    {
+      "number": 9,
+      "key": "fire_masks",
+      "title": "Ảnh đầu vào và các mặt nạ trung gian của detector lửa"
+    },
+    {
+      "number": 10,
+      "key": "smoke_flow",
+      "title": "Chuỗi phát hiện khói và xác thực chuyển động theo vùng"
+    },
+    {
+      "number": 11,
+      "key": "hybrid_flow",
+      "title": "Cơ chế bỏ qua YOLO và xác nhận vùng trong Hybrid hiện tại"
+    },
+    {
+      "number": 12,
+      "key": "stream_flow",
+      "title": "Luồng xử lý webcam video và Camera IP trong GUI"
+    },
+    {
+      "number": 13,
+      "key": "image_flow",
+      "title": "Đường đi riêng của xem trước và nhận diện ảnh tĩnh"
+    },
+    {
+      "number": 14,
+      "key": "threads",
+      "title": "Trao đổi dữ liệu giữa worker và main thread"
+    },
+    {
+      "number": 15,
+      "key": "alert_flow",
+      "title": "Điều kiện kích hoạt và dừng âm thanh cảnh báo"
+    },
+    {
+      "number": 16,
+      "key": "benchmark_chart",
+      "title": "Các giá trị Precision Recall và F1 trong comparison_summary.json"
+    },
+    {
+      "number": 17,
+      "key": "sample_fire",
+      "title": "Đối chiếu ảnh AoF07738 giữa các phương pháp"
+    },
+    {
+      "number": 18,
+      "key": "sample_smoke",
+      "title": "Ví dụ khói mà YOLO chưa phát hiện trong lượt kiểm tra"
+    },
+    {
+      "number": 19,
+      "key": "sample_negative",
+      "title": "Ví dụ âm tính có cảnh báo khói từ Traditional và Combined"
+    }
+  ],
+  "tables": [
+    {
+      "number": 1,
+      "key": "roles",
+      "title": "Phân công và sản phẩm của bốn thành viên",
+      "rows": 4
+    },
+    {
+      "number": 2,
+      "key": "requirements",
+      "title": "Yêu cầu chức năng và bằng chứng cần có",
+      "rows": 7
+    },
+    {
+      "number": 3,
+      "key": "contract",
+      "title": "Hợp đồng đầu ra detector",
+      "rows": 5
+    },
+    {
+      "number": 4,
+      "key": "config",
+      "title": "Các cấu hình chung đang dùng",
+      "rows": 8
+    },
+    {
+      "number": 5,
+      "key": "preprocess",
+      "title": "Các hàm tiền xử lý của TV2",
+      "rows": 6
+    },
+    {
+      "number": 6,
+      "key": "fire_params",
+      "title": "Tham số lửa thực tế trong PARAMS",
+      "rows": 7
+    },
+    {
+      "number": 7,
+      "key": "smoke_params",
+      "title": "Các nhóm tham số khói đang dùng",
+      "rows": 9
+    },
+    {
+      "number": 8,
+      "key": "dataset",
+      "title": "Thống kê dữ liệu local theo file nhãn",
+      "rows": 3
+    },
+    {
+      "number": 9,
+      "key": "presets",
+      "title": "Ba preset huấn luyện có trong train.py",
+      "rows": 3
+    },
+    {
+      "number": 10,
+      "key": "alert_timeline",
+      "title": "Ví dụ logic chuỗi năm frame không phải số đo thực nghiệm",
+      "rows": 7
+    },
+    {
+      "number": 11,
+      "key": "evidence",
+      "title": "Phân loại nguồn bằng chứng sử dụng trong báo cáo",
+      "rows": 6
+    },
+    {
+      "number": 12,
+      "key": "benchmark",
+      "title": "Kết quả lưu sẵn với 100 ảnh mỗi phương pháp",
+      "rows": 4
+    },
+    {
+      "number": 13,
+      "key": "ablation_pre",
+      "title": "Ablation tiền xử lý đang lưu",
+      "rows": 7
+    },
+    {
+      "number": 14,
+      "key": "ablation_filter",
+      "title": "Ablation các bước lọc lửa đang lưu",
+      "rows": 7
+    },
+    {
+      "number": 15,
+      "key": "samples",
+      "title": "Kết quả từng mẫu trong kiểm tra tích hợp",
+      "rows": 3
+    },
+    {
+      "number": 16,
+      "key": "native_tests",
+      "title": "Kết quả kiểm thử tích hợp đã ghi",
+      "rows": 8
+    },
+    {
+      "number": 17,
+      "key": "test_matrix",
+      "title": "Các nhóm kiểm thử trong bộ 14 test",
+      "rows": 8
+    },
+    {
+      "number": 18,
+      "key": "roadmap",
+      "title": "Hướng phát triển và trách nhiệm phối hợp",
+      "rows": 6
+    },
+    {
+      "number": 19,
+      "key": "files",
+      "title": "Các module thực tế và người phụ trách",
+      "rows": 12
+    },
+    {
+      "number": 20,
+      "key": "glossary",
+      "title": "Các ký hiệu và từ viết tắt",
+      "rows": 10
+    },
+    {
+      "number": 21,
+      "key": "demo",
+      "title": "Bảng kiểm tra trước buổi demo",
+      "rows": 7
+    },
+    {
+      "number": 22,
+      "key": "missing",
+      "title": "Minh chứng cần hoàn thiện và người xác nhận",
+      "rows": 9
+    }
+  ],
+  "paragraphs": 585,
+  "body_characters": 82190,
+  "output": "C:\\HOCTAP_VALAMVIEC\\Hoc Tap\\fire-smoke-detection\\report\\BaoCao_DoAn_Fire_Smoke_Detection_Nhom4TV.docx"
+}

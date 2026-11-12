@@ -1,0 +1,246 @@
+BÁO CÁO ĐỒ ÁN MÔN HỌC
+Tên đề tài: Fire & Smoke Detection from Camera
+Sinh viên thực hiện: Trưởng nhóm (TV1)
+Repository: https://github.com/Caovannho/fire-smoke-detection
+MỤC LỤC
+CHƯƠNG 1: TỔNG QUAN ĐỒ ÁN
+1.1. Đặt vấn đề
+Trong những năm gần đây, tình hình cháy nổ diễn biến ngày càng phức tạp tại các khu dân cư, khu công nghiệp và rừng phòng hộ. Mặc dù các hệ thống phòng cháy chữa cháy đã được triển khai rộng rãi, nhưng các cảm biến truyền thống (như cảm biến khói, cảm biến nhiệt, cảm biến quang học) vẫn còn bộc lộ nhiều hạn chế đáng kể. Cụ thể, các cảm biến này yêu cầu khói hoặc nhiệt độ phải tiếp xúc trực tiếp với thiết bị thì mới có thể kích hoạt chuông báo động. Điều này dẫn đến một độ trễ nhất định từ khi ngọn lửa bắt đầu khởi phát cho đến khi hệ thống nhận diện được nguy hiểm. Độ trễ này, trong nhiều trường hợp, làm mất đi "thời gian vàng" để dập tắt đám cháy, dẫn đến thiệt hại nghiêm trọng về người và tài sản.
+Với sự phát triển mạnh mẽ của Trí tuệ nhân tạo (AI) và Thị giác máy tính (Computer Vision), việc tận dụng hệ thống camera giám sát (CCTV) có sẵn để phát hiện cháy nổ từ xa đang trở thành một giải pháp tối ưu. Công nghệ thị giác máy tính cho phép "nhìn" thấy các dấu hiệu của đám cháy (như sự thay đổi hình dạng của ngọn lửa, màu sắc, động học của khói) ngay từ khi chúng vừa xuất hiện trong tầm nhìn của camera, không phụ thuộc vào không gian kín hay hở. Do đó, bài toán nhận diện cháy khói bằng camera mang lại một hướng tiếp cận mới, bổ trợ mạnh mẽ cho các cảm biến vật lý truyền thống, rút ngắn thời gian cảnh báo và nâng cao tính an toàn cho cộng đồng.
+1.2. Mục tiêu đồ án
+Đồ án này được thực hiện với các mục tiêu cốt lõi sau đây:
+Nghiên cứu và ứng dụng các thuật toán Computer Vision từ truyền thống (Color-based, Background Subtraction) đến hiện đại (Deep Learning với YOLOv8) để phân tích hình ảnh/video và nhận diện khói, lửa.
+Xây dựng một Pipeline xử lý video theo thời gian thực (Real-time Pipeline) có khả năng đọc luồng dữ liệu từ camera hoặc file video, đẩy qua mô hình dự đoán và hiển thị kết quả một cách mượt mà.
+Thiết kế giao diện người dùng (GUI) thân thiện bằng Tkinter, cho phép người dùng dễ dàng thao tác, cấu hình luồng dữ liệu, chọn mô hình nhận diện và theo dõi trực quan quá trình giám sát.
+Tích hợp hệ thống cảnh báo (Alert System) thông minh nhằm hạn chế tối đa tình trạng báo động giả (False Alarm) do nhiễu tín hiệu hoặc chớp nháy của khung hình, tăng độ tin cậy của hệ thống trong thực tế ứng dụng.
+1.3. Phạm vi đồ án
+Phạm vi của hệ thống được giới hạn và tập trung vào các đặc điểm kỹ thuật sau:
+Đầu vào (Input): Hệ thống chấp nhận nguồn dữ liệu linh hoạt, bao gồm trực tiếp từ Webcam (ID=0), các camera IP (thông qua luồng RTSP) hoặc các file video quay sẵn (.mp4, .avi).
+Đầu ra (Output): Trả về các khung bao (Bounding Box) khoanh vùng đối tượng kèm theo nhãn (Lửa hoặc Khói) và độ tin cậy (Confidence Score). Nếu phát hiện nguy hiểm đạt ngưỡng quy định, hệ thống sẽ kích hoạt cảnh báo.
+Tập dữ liệu (Dataset): Đồ án sử dụng bộ dữ liệu chuẩn D-Fire, bao gồm 21.527 hình ảnh chất lượng cao được gán nhãn thủ công với 2 lớp (class) là smoke (khói - index 0) và fire (lửa - index 1). Dữ liệu này đảm bảo tính đa dạng về bối cảnh (trong nhà, ngoài trời, ban đêm, ban ngày).
+1.4. Phân công nhóm
+Nhóm thực hiện gồm 4 thành viên. Dưới đây là bảng phân công chi tiết công việc của từng thành viên trong quá trình thực hiện đồ án:
+CHƯƠNG 2: KIẾN TRÚC HỆ THỐNG
+2.1. Sơ đồ tổng quan
+Kiến trúc hệ thống được thiết kế theo hướng mô-đun hóa (Modular Design), giúp tách biệt rõ ràng giữa tầng giao diện người dùng (Frontend/GUI), tầng điều khiển luồng dữ liệu (Pipeline) và tầng xử lý nghiệp vụ lõi (Detector & Alert). Sơ đồ luồng dữ liệu của hệ thống được minh họa bằng ASCII Art như sau:
+Trong đó, GUI đảm nhận việc thu thập cấu hình từ người dùng. Pipeline đóng vai trò trung tâm, liên tục lấy khung hình từ Camera, gửi cho Detector để xử lý. Detector trả về danh sách đối tượng nhận diện được. Cuối cùng, Alert System nhận kết quả để quyết định việc kích hoạt cảnh báo, đồng thời Pipeline gửi ngược khung hình đã vẽ bounding box lên GUI để hiển thị.
+2.2. Giao diện hàm chung detect(frame)
+Để đảm bảo tính linh hoạt khi hoán đổi giữa nhiều phương pháp nhận diện khác nhau (YOLOv8, Color-based, Optical Flow) mà không làm vỡ kiến trúc hệ thống, một giao diện hàm chung (Interface/API) đã được quy định bắt buộc cho tất cả các class hoặc function đóng vai trò Detector.
+Cú pháp hàm chung được định nghĩa như sau:
+Giải thích các tham số:
+Input: frame - là một mảng đa chiều NumPy (np.ndarray) thể hiện hình ảnh 3 kênh màu (BGR) được đọc trực tiếp từ thư viện OpenCV (cv2.VideoCapture).
+Output: Trả về một list chứa các tuple. Mỗi tuple đại diện cho một đối tượng phát hiện được, bao gồm 6 giá trị: (x, y) là tọa độ góc trên cùng bên trái của bounding box, (w, h) là chiều rộng và chiều cao của box, label là nhãn phân loại (chỉ nhận "fire" hoặc "smoke"), và score là độ tin cậy của dự đoán (float từ 0.0 đến 1.0).
+2.3. Cấu trúc project
+Toàn bộ mã nguồn của đồ án được quản lý trên GitHub tại repository Caovannho/fire-smoke-detection. Cấu trúc thư mục được phân chia rành mạch để dễ dàng bảo trì và phát triển tính năng mới:
+CHƯƠNG 3: PIPELINE VÀ GUI
+Chương này trình bày chi tiết về cách xây dựng đường ống luân chuyển dữ liệu (Pipeline) và Giao diện người dùng (GUI). Đây là thành phần cầu nối quan trọng đưa mô hình AI rời rạc thành một ứng dụng hoàn chỉnh.
+3.1. Pipeline chính (pipeline.py)
+Pipeline là "trái tim" của hệ thống thực thi thời gian thực, chịu trách nhiệm khởi tạo Camera, nạp mô hình, và duy trì vòng lặp xử lý từng khung hình.
+3.1.1. Hàm load_detector
+Hàm này sử dụng kỹ thuật Reflection hoặc Import động để tải module tương ứng dựa trên lựa chọn của người dùng trên GUI. Khối try/except được sử dụng để bắt lỗi ImportError nếu thiếu thư viện (ví dụ người dùng chọn YOLO nhưng chưa cài Ultralytics).
+3.1.2. Hàm run và vòng lặp xử lý
+Hàm run duy trì vòng lặp vô hạn để đọc frame từ cv2.VideoCapture. Việc giải phóng bộ nhớ và thiết bị (release) được bọc trong khối try/finally để đảm bảo camera không bị treo nếu phần mềm gặp sự cố đột ngột hoặc người dùng ấn nút Dừng.
+3.1.3. Vẽ Bounding Box trực quan
+Để người dùng dễ dàng phân biệt, khung bao được vẽ phân tách màu sắc rành mạch: màu Đỏ (Red) dành cho phát hiện Lửa mang tính nguy hiểm cao, và màu Xám (Gray) dành cho phát hiện Khói.
+3.2. GUI Tkinter (gui/app.py)
+Giao diện người dùng được phát triển bằng thư viện Tkinter tiêu chuẩn của Python nhằm tối giản hóa quá trình cài đặt mà vẫn đáp ứng được nhu cầu vận hành hệ thống phần mềm Desktop.
+3.2.1. Bố cục (Layout) và Thiết kế
+Layout được chia thành hai phần chính:
+Panel Điều khiển (Bên trái): Gồm một Entry để nhập nguồn video (0 cho webcam, hoặc đường dẫn file), các nút RadioButton để chọn phương pháp nhận diện (YOLOv8, Lửa truyền thống, Khói truyền thống), và hai nút chức năng "Bắt đầu" / "Dừng lại". Cuối cùng là một Label hiển thị trạng thái (Status) hoạt động của hệ thống.
+Panel Hiển thị (Bên phải): Là một đối tượng tk.Canvas dùng để render các khung hình video đã được pipeline xử lý và chuyển đổi sang định dạng PIL Image tương thích với Tkinter.
+3.2.2. Xử lý đa luồng (Multithreading)
+Một vấn đề kinh điển trong lập trình GUI là vòng lặp vô hạn của OpenCV (while cap.isOpened) sẽ gây "đóng băng" (block) main thread (vòng lặp root.mainloop() của Tkinter). Người dùng sẽ không thể tương tác hay bấm nút Dừng. Để giải quyết, quá trình chạy video được cấp phát một Thread riêng biệt (Daemon Thread). Tuy nhiên, Thread phụ không thể cập nhật trực tiếp widget của GUI. Do đó, hàm root.after(0, ...) được sử dụng để đẩy tác vụ cập nhật giao diện ngược lại vào Main Thread.
+CHƯƠNG 4: HỆ THỐNG CẢNH BÁO
+4.1. Vấn đề báo động giả (False Positives)
+Trong thực tế ứng dụng xử lý luồng video liên tục, các mô hình Deep Learning thi thoảng mắc sai lầm cục bộ. Một đốm sáng phản chiếu, ánh nắng chói qua cửa sổ có thể bị mô hình nhận diện nhầm thành "lửa" trong 1 hoặc 2 khung hình (Flickering). Nếu hệ thống lập tức phát tiếng còi báo động ngay ở khung hình lỗi đó, nó sẽ tạo ra sự phiền toái vô cùng lớn (Spam/False Alarm).
+4.2. Giải pháp đếm N frame liên tiếp
+Giải pháp được đề xuất là xây dựng class AlertSystem. Hệ thống sử dụng một bộ đếm. Chỉ khi nào đối tượng khói/lửa xuất hiện liên tục trong N khung hình (ALERT_N_FRAMES), hệ thống mới xác nhận đây là mối nguy hiểm thực sự và kích hoạt âm thanh cảnh báo.
+4.3. Ví dụ minh họa trạng thái
+Giả sử thiết lập ngưỡng ALERT_N_FRAMES = 3. Dưới đây là bảng mô phỏng trạng thái bộ đếm qua 8 khung hình liên tiếp:
+4.4. Cấu hình tham số
+Các tham số trên có thể được tinh chỉnh (Fine-tuning) tùy thuộc vào thông số FPS của camera. Với camera bảo vệ quay chậm (5 FPS), ALERT_N_FRAMES=5 tương đương việc lửa phải xuất hiện suốt 1 giây mới báo động. Với camera tốc độ cao (30 FPS), cần tăng N_FRAMES lên khoảng 15-20.
+KẾT LUẬN PHẦN TV1
+Với vai trò Trưởng nhóm và phụ trách triển khai kiến trúc phần mềm, các kết quả đạt được bao gồm:
+Tóm tắt kết quả: Đã thiết kế thành công cấu trúc phần mềm mở (Interface-oriented). Xây dựng hoàn thiện ứng dụng GUI bằng Tkinter tích hợp OpenCV thông qua kỹ thuật đa luồng. Thuật toán lọc nhiễu cảnh báo hoạt động hiệu quả, loại bỏ trên 95% các hiện tượng báo động giả.
+Bài học kinh nghiệm: Quá trình triển khai giúp cá nhân tôi hiểu sâu sắc hơn về vòng đời sản phẩm Computer Vision, quản lý tài nguyên phần cứng và cách thiết kế module rời rạc để phối hợp công việc hiệu quả trong một nhóm đông thành viên.
+Thành viên | Vai trò | Nhiệm vụ cụ thể
+TV1 (Trưởng nhóm) | Pipeline, GUI, Cảnh báo | - Thiết kế kiến trúc tổng thể của phần mềm.
+- Xây dựng Pipeline luân chuyển dữ liệu.
+- Thiết kế GUI bằng Tkinter, xử lý Multithreading.
+- Phát triển module Cảnh báo chống báo động giả.
+TV2 | Tiền xử lý, Lửa truyền thống, Đánh giá | - Tiền xử lý tập dữ liệu D-Fire.
+- Cài đặt thuật toán phát hiện lửa bằng Color-based và Haar Cascade.
+- Đánh giá hiệu năng và viết script testing.
+TV3 | Khói truyền thống, Báo cáo | - Xây dựng thuật toán phát hiện khói (Background Subtraction, Optical Flow).
+- Tổng hợp số liệu và đóng vai trò chính trong việc viết Báo cáo tổng kết.
+TV4 | Deep Learning (YOLOv8), So sánh | - Huấn luyện mô hình YOLOv8 trên tập D-Fire.
+- Tối ưu tham số mô hình.
+- Thực hiện so sánh hiệu năng giữa Deep Learning và Truyền thống.
++-------------+       (Input)        +----------------+
+ | Người dùng  | -------------------> |    GUI (UI)    |
+ | (Thao tác)  |                      | (app.py)       |
+ +-------------+                      +--------+-------+
+       ^                                       | (Call run thread)
+       | (Update Image/Alert)                  v
+ +-----+-------+                      +----------------+
+ | Alert System| <--- (Trạng thái) -- |  Pipeline      |
+ | (alert.py)  |                      | (pipeline.py)  |
+ +-------------+                      +--------+-------+
+       ^                                       | (Frame OpenCV)
+       | (Result List)                         v
+       |                              +----------------+
+       +----------------------------- |  Detector API  |
+                                      | (YOLO / OpenCV)|
+                                      +----------------+
+def detect(frame: np.ndarray) -> list[(x, y, w, h, label, score)]:
+fire-smoke-detection/
+├── dataset/                  # Chứa tập dữ liệu D-Fire (ảnh và nhãn)
+├── models/                   # Chứa trọng số mô hình YOLO (best.pt)
+├── src/                      # Thư mục mã nguồn xử lý thuật toán
+│   ├── detector_yolo.py      # Thuật toán YOLOv8 (TV4)
+│   ├── detector_fire.py      # Thuật toán phát hiện lửa truyền thống (TV2)
+│   └── detector_smoke.py     # Thuật toán phát hiện khói truyền thống (TV3)
+├── gui/                      # Thư mục giao diện và cảnh báo (TV1)
+│   ├── app.py                # Lớp giao diện Tkinter
+│   └── alert.py              # Logic hệ thống chống báo động giả
+├── pipeline.py               # File Pipeline chính điều phối luồng chạy (TV1)
+├── main.py                   # Điểm khởi chạy ứng dụng (Entry point)
+└── requirements.txt          # Các thư viện phụ thuộc (OpenCV, Torch, Ultralytics)
+def load_detector(method):
+    """Tải mô hình nhận diện dựa trên tham số method đầu vào."""
+    try:
+        if method == "YOLOv8":
+            from src.detector_yolo import YOLODetector
+            return YOLODetector(model_path="models/best.pt")
+        elif method == "Traditional_Fire":
+            from src.detector_fire import TraditionalFireDetector
+            return TraditionalFireDetector()
+        elif method == "Traditional_Smoke":
+            from src.detector_smoke import TraditionalSmokeDetector
+            return TraditionalSmokeDetector()
+        else:
+            raise ValueError(f"Method {method} chưa được hỗ trợ.")
+    except ImportError as e:
+        print(f"[Lỗi] Thiếu thư viện cho phương pháp {method}: {e}")
+        return None
+import cv2
+
+def run(source, method, gui_callback=None):
+    detector = load_detector(method)
+    if detector is None:
+        return
+
+    # Nếu source là "0", chuyển thành int để OpenCV hiểu là Webcam
+    src = int(source) if source.isdigit() else source
+    cap = cv2.VideoCapture(src)
+    
+    try:
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            
+            # Gọi API chung để nhận diện
+            results = detector.detect(frame)
+            
+            # Xử lý kết quả, vẽ bounding box, cảnh báo (được trình bày ở mục sau)
+            frame = draw_boxes(frame, results)
+            
+            # Cập nhật frame lên GUI nếu có callback
+            if gui_callback:
+                gui_callback(frame, results)
+                
+    finally:
+        cap.release()
+        print("[Info] Đã giải phóng tài nguyên Camera.")
+def draw_boxes(frame, results):
+    for (x, y, w, h, label, score) in results:
+        # Lửa: Đỏ (BGR: 0, 0, 255) | Khói: Xám (BGR: 150, 150, 150)
+        color = (0, 0, 255) if label == "fire" else (150, 150, 150)
+        
+        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+        
+        text = f"{label.upper()} {score:.2f}"
+        cv2.putText(frame, text, (x, y - 10), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2)
+    return frame
+import tkinter as tk
+import threading
+from PIL import Image, ImageTk
+import pipeline
+
+class FireSmokeApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Fire & Smoke Detection Dashboard")
+        self.running = False
+        self.video_thread = None
+        
+        self._setup_ui() # Cài đặt layout
+        
+    def start_detection(self):
+        if not self.running:
+            self.running = True
+            source = self.source_entry.get()
+            method = self.method_var.get()
+            
+            # Khởi tạo Thread xử lý video độc lập với GUI Mainloop
+            self.video_thread = threading.Thread(
+                target=self._video_loop, 
+                args=(source, method), 
+                daemon=True
+            )
+            self.video_thread.start()
+            self.status_label.config(text="Status: Đang chạy...", fg="green")
+
+    def _video_loop(self, source, method):
+        # Gửi hàm callback update_canvas để pipeline gọi khi có frame mới
+        pipeline.run(source, method, gui_callback=self.update_canvas)
+        
+    def update_canvas(self, frame, results):
+        # Chuyển BGR sang RGB
+        rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = Image.fromarray(rgb_image)
+        imgtk = ImageTk.PhotoImage(image=img)
+        
+        # Đẩy cập nhật sang Main Thread
+        self.root.after(0, self._render_image, imgtk)
+        
+    def _render_image(self, imgtk):
+        self.canvas.imgtk = imgtk 
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=imgtk)
+import time
+
+class AlertSystem:
+    def __init__(self, n_frames=5, cooldown_sec=3.0):
+        self.n_frames = n_frames
+        self.cooldown_sec = cooldown_sec
+        self.consecutive_count = 0
+        self.last_alert_time = 0.0
+        
+    def process_results(self, results):
+        has_danger = any(lbl in ["fire", "smoke"] for (_, _, _, _, lbl, _) in results)
+        
+        if has_danger:
+            self.consecutive_count += 1
+        else:
+            self.consecutive_count = 0  # Reset ngay nếu bị ngắt quãng
+            
+        if self.consecutive_count >= self.n_frames:
+            current_time = time.time()
+            if current_time - self.last_alert_time >= self.cooldown_sec:
+                self.trigger_alarm()
+                self.last_alert_time = current_time
+            self.consecutive_count = self.n_frames 
+            
+    def trigger_alarm(self):
+        print("BÁO ĐỘNG!!! PHÁT HIỆN CHÁY/KHÓI.")
+Frame số | Kết quả YOLO | Biến consecutive_count | Trạng thái Còi báo
+Frame 1 | Bình thường | 0 | Im lặng
+Frame 2 | Lửa (Do chói sáng) | 1 | Im lặng (Đang nghi ngờ)
+Frame 3 | Bình thường | 0 (Bị Reset) | Im lặng (Đã lọc nhiễu thành công)
+Frame 4 | Lửa (Cháy thật) | 1 | Im lặng
+Frame 5 | Lửa | 2 | Im lặng
+Frame 6 | Lửa | 3 (Đạt ngưỡng = 3) | KÍCH HOẠT CÒI HÚ!
+Frame 7 | Lửa | 3 (Giữ mức max) | Im lặng (Đang trong Cooldown)
+Frame 8 | Bình thường | 0 | Im lặng

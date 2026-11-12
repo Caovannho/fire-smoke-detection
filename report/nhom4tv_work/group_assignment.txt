@@ -1,0 +1,852 @@
+Tài liệu nhóm – Fire & Smoke Detection
+📚 Tài liệu
+nhóm
+1. Phân công
+Tổng quan phân công
+0. Việc chung
+TV1 – Trưởng nhóm
+TV2 – Lửa + Đánh giá
+TV3 – Khói + Báo cáo
+TV4 – YOLO
+Lịch trình tuần
+Lưu ý khi làm
+2. Hướng dẫn Git
+Tổng quan Git
+Bước 1: Tạo GitHub
+Bước 2: Cài Git
+Bước 3: Cấu hình
+3. Khắc phục Copilot
+Panel chat hiện Copilot
+4. Cấu trúc project
+Tổng quan cấu trúc
+Cây thư mục
+Hướng dẫn tải dataset
+Tổng hợp ai làm gì
+Lưu ý quan trọng
+🔥 Phân công công việc nhóm
+Đồ án: Phát hiện lửa và khói (Truyền thống + YOLO + GUI)
+📌 Điều chỉnh so với bảng gốc:
+Bộ đánh giá
+giao cho
+TV2
+(nhánh lửa nhẹ hơn khói),
+GUI + cảnh báo
+giao cho
+TV1
+(gắn với pipeline),
+Báo cáo/slide
+giao cho
+TV3
+tổng hợp.
+0. Việc chung (Tuần 1 – cả nhóm)
+Thống nhất Python 3.10, OpenCV, PyTorch/Ultralytics, tạo repo GitHub với cấu trúc:
+data/
+,
+traditional/
+,
+yolo/
+,
+eval/
+,
+gui/
+,
+report/
+.
+Thống nhất giao diện hàm
+để ghép code không bị lỗi:
+Đầu vào:
+frame
+(ảnh BGR, đã resize 640×480).
+Đầu ra: danh sách
+(x, y, w, h, label, score)
+với
+label
+là
+"fire"
+hoặc
+"smoke"
+.
+Thống nhất định dạng nhãn tập test và quy ước đặt tên file kết quả.
+👤 TV1
+Trưởng nhóm · Dữ liệu · Pipeline · GUI · Cảnh báo
+STT
+Công việc
+Sản phẩm bàn giao
+1
+Lập kế hoạch, theo dõi tiến độ, họp nhóm hàng tuần, quản lý repo
+Bảng tiến độ, repo
+2
+Thu thập dataset: ảnh/video lửa, khói, và ảnh nhiễu (áo đỏ, đèn, hoàng hôn, mây, hơi nước, khói xe)
+Thư mục
+data/
+phân loại
+3
+Chia tập train/val/test (test chứa cả video có cháy và video không cháy)
+File danh sách chia tập
+4
+Pipeline đọc video/webcam, gọi các detector theo giao diện chung
+pipeline.py
+5
+Logic cảnh báo: báo khi có phát hiện liên tiếp N khung hình (không chỉ theo giây), phát chuông, hiện thông báo đỏ
+alert.py
+6
+GUI (Tkinter/PyQt5/Streamlit): chọn nguồn video, chọn phương pháp (truyền thống/YOLO/kết hợp), bật/tắt, hiển thị FPS
+gui/
+7
+Tích hợp toàn bộ module, chạy thử end-to-end
+Bản chạy hoàn chỉnh
+8
+Viết chương: tổng quan, kiến trúc hệ thống, GUI và cảnh báo
+Chương trong báo cáo
+👤 TV2
+Tiền xử lý · Phát hiện lửa (truyền thống) · Bộ đánh giá
+STT
+Công việc
+Sản phẩm bàn giao
+1
+Tiền xử lý: resize, lọc Gaussian/Median, cân bằng sáng nếu cần, so sánh hiệu quả từng bộ lọc
+preprocess.py
+2
+Chuyển không gian màu RGB sang HSV/YCbCr, khảo sát và chọn ngưỡng màu lửa bằng thực nghiệm
+Ngưỡng + hình minh họa
+3
+Hình thái học (opening/closing), contour, lọc theo diện tích và tỉ lệ khung
+fire_detect.py
+4
+Đặc trưng thời gian: độ nhấp nháy của vùng lửa giữa các khung hình để loại đèn, áo đỏ
+Hàm lọc nhấp nháy
+5
+Xây bộ đánh giá chung:
+tính Precision, Recall, F1, tỉ lệ báo động giả, FPS, dùng cùng tập test cho mọi phương pháp
+eval/evaluate.py
+6
+Viết chương: tiền xử lý, phát hiện lửa truyền thống, phương pháp đánh giá
+Chương trong báo cáo
+👤 TV3
+Phát hiện khói (truyền thống) · Tổng hợp báo cáo
+STT
+Công việc
+Sản phẩm bàn giao
+1
+Trừ nền (MOG2/KNN) để tìm vùng chuyển động
+smoke_detect.py
+2
+Lọc vùng ứng viên khói: màu xám/trắng nhạt (độ bão hòa thấp), hình thái học, lọc diện tích
+Hàm lọc ứng viên
+3
+Đặc trưng khói: độ mờ cạnh (giảm gradient so với nền), texture/phương sai độ xám, xu hướng lan lên và mở rộng vùng theo thời gian
+Hàm tính đặc trưng
+4
+Phân tích các trường hợp nhiễu (mây, sương, hơi nước, người đi qua) và cách giảm báo động giả
+Bảng phân tích lỗi
+5
+Tổng hợp báo cáo Word: ghép chương, định dạng, mục lục, tài liệu tham khảo
+report/
+6
+Làm slide thuyết trình (các thành viên gửi nội dung phần mình)
+File PowerPoint
+7
+Viết chương: phát hiện khói truyền thống
+Chương trong báo cáo
+👤 TV4
+YOLO · Gán nhãn · So sánh kết quả
+STT
+Công việc
+Sản phẩm bàn giao
+1
+Chọn công cụ gán nhãn (Roboflow/LabelImg), thống nhất quy tắc nhãn,
+điều phối gán nhãn cả nhóm
+Hướng dẫn gán nhãn
+2
+Huấn luyện YOLOv8 (bắt đầu bằng mô hình nhỏ như
+yolov8n
+/
+yolov8s
+), thử augmentation
+Weights
+.pt
+3
+Tinh chỉnh siêu tham số, so sánh 2 đến 3 cấu hình
+Bảng kết quả huấn luyện
+4
+Viết hàm
+detect(frame)
+đúng giao diện chung để ghép vào pipeline
+yolo_detect.py
+5
+Chạy bộ đánh giá của TV2 cho YOLO, vẽ biểu đồ so sánh với 2 phương pháp truyền thống
+Biểu đồ, bảng so sánh
+6
+Thử phương pháp kết hợp: truyền thống lọc ứng viên nhanh, YOLO xác nhận
+hybrid_detect.py
+7
+Viết chương: YOLO, so sánh và kết luận
+Chương trong báo cáo
+📋 Gán nhãn chia đều:
+mỗi người gán nhãn khoảng 1/4 số ảnh. Riêng nhánh truyền thống chỉ cần nhãn mức khung hình (có/không cháy, có/không khói) cho tập test, nên khối lượng nhẹ hơn nhiều so với YOLO.
+Lịch trình theo tuần
+Tuần
+TV1
+TV2
+TV3
+TV4
+1
+Repo, giao diện hàm, thu thập dataset, chia tập
+Tiền xử lý, khảo sát màu lửa
+Tìm hiểu trừ nền, thử MOG2 trên video mẫu
+Chọn công cụ nhãn, bắt đầu gán nhãn, chạy thử YOLO với dữ liệu nhỏ
+2
+Pipeline video/webcam, khung GUI
+Hoàn thiện detector lửa, viết
+evaluate.py
+Hoàn thiện detector khói, đặc trưng khói
+Train YOLO chính thức, đo mAP
+3
+Logic cảnh báo, GUI hoàn chỉnh, tích hợp 3 detector
+Chạy đánh giá bản truyền thống, giảm báo động giả
+Phân tích lỗi khói, bắt đầu ghép báo cáo
+Tinh chỉnh YOLO, thử hybrid, chạy đánh giá
+4
+Test thực tế (webcam, video nhiễu), sửa lỗi tích hợp
+Hoàn thiện chương của mình, hỗ trợ test
+Hoàn thiện báo cáo, làm slide
+Bảng/biểu đồ so sánh, chương kết luận, tập thuyết trình
+⏱️ Mốc kiểm tra:
+Cuối tuần 1:
+giao diện hàm chốt xong, có dataset.
+Cuối tuần 2:
+mỗi detector chạy độc lập được.
+Cuối tuần 3:
+bản ghép chạy được.
+3. Lưu ý khi làm
+Phần truyền thống nên dùng các hàm OpenCV cơ bản kèm giải thích tham số, tránh coi như hộp đen; hãy chèn ảnh trung gian (mask HSV, sau hình thái học, contour) vào báo cáo để thấy rõ kiến thức môn học.
+TV2 và TV3 nên làm bảng báo động giả riêng cho từng loại nhiễu, rất có giá trị khi so với YOLO.
+Mỗi người tự viết chương của mình, tránh dồn hết cho một người vào tuần cuối.
+💡 Nếu bạn muốn, tôi có thể xuất bản này thành file Word hoặc Excel (bảng phân công và tiến độ) để nhóm dùng trực tiếp.
+⚙️ Hướng dẫn Git cho thành viên
+Bước 1 → Bước 3: Tạo tài khoản, cài Git, cấu hình lần đầu
+Bước 1: Tạo tài khoản GitHub (nếu chưa có)
+Vào
+https://github.com
+Bấm
+Sign up
+Điền email cá nhân (đừng dùng email trường), mật khẩu, username (không dấu, viết liền, ví dụ:
+nguyenvan-a
+)
+Xác nhận email GitHub gửi về
+Đăng nhập
+Lưu ý:
+Ghi nhớ username vì lát nữa cần dùng để cấu hình Git.
+Bước 2: Cài Git trên máy
+Vào
+https://git-scm.com
+Tải bản cho Windows, chạy file cài đặt
+Cứ bấm
+Next
+theo mặc định. Riêng bước
+"Adjusting the name of the initial branch..."
+, chọn
+Override
+và gõ
+main
+(thay vì
+master
+)
+Cài xong, mở
+Git Bash
+(chuột phải Desktop →
+Open Git Bash Here
+)
+Kiểm tra:
+git --version
+Ra số version (ví dụ
+git version 2.45.1
+) là OK.
+Bước 3: Cấu hình Git lần đầu
+Trong Git Bash, gõ 2 lệnh (thay bằng thông tin của bạn):
+git config --global user.name "Nguyen Van A"
+git config --global user.email "email-ban-da-dang-ky-github@gmail.com"
+🔹 Thay thế:
+"Nguyen Van A"
+→ Tên thật của bạn (có dấu cũng được, nhưng nên viết không dấu để tránh lỗi font).
+"email-ban-da-dang-ky-github@gmail.com"
+→ Email bạn đã dùng để đăng ký GitHub ở Bước 1.
+Kiểm tra lại cấu hình
+git config --global --list
+Kết quả hiện ra phải có 2 dòng:
+user.name=Nguyen Van A
+user.email=email-ban-da-dang-ky-github@gmail.com
+Bảng thông tin cần điền cho từng thành viên
+Mỗi bạn điền vào bảng dưới đây (ví dụ minh họa), rồi dùng đúng thông tin đó để cấu hình Git:
+Thành viên
+Tên Git (user.name)
+Email GitHub (user.email)
+Username GitHub
+TV1
+(Trưởng nhóm)
+Cao Van Nho
+caovannho@gmail.com
+Caovannho
+TV2
+...
+...
+...
+TV3
+...
+...
+...
+TV4
+...
+...
+...
+⚠️ Cảnh báo:
+Nếu bạn dùng email trường (ví dụ
+@st.edu.vn
+) thì GitHub vẫn cho phép, nhưng nên dùng email cá nhân để tránh mất quyền truy cập sau khi tốt nghiệp. Nếu đã lỡ dùng email trường, có thể thêm email cá nhân vào GitHub sau.
+Cấu hình SSH key (khuyến nghị – để không phải nhập mật khẩu)
+Nếu chỉ dùng HTTPS, mỗi lần
+git push
+bạn sẽ phải nhập username + token. Dùng SSH sẽ tiện hơn nhiều.
+Bước 1: Tạo SSH key
+ssh-keygen -t ed25519 -C "email-ban-da-dang-ky-github@gmail.com"
+Nhấn
+Enter
+liên tục (3 lần) để dùng mặc định. Kết quả tạo ra file
+~/.ssh/id_ed25519.pub
+.
+Bước 2: Copy nội dung public key
+cat ~/.ssh/id_ed25519.pub
+Copy toàn bộ dòng hiện ra (bắt đầu bằng
+ssh-ed25519
+).
+Bước 3: Thêm SSH key vào GitHub
+Vào
+https://github.com/settings/keys
+Bấm
+New SSH key
+Title: đặt tên máy (ví dụ:
+Laptop cua A
+)
+Key: dán nội dung vừa copy
+Bấm
+Add SSH key
+Bước 4: Kiểm tra kết nối
+ssh -T git@github.com
+Nếu hiện
+Hi username! You've successfully authenticated...
+là thành công.
+Clone repo và push thử
+Sau khi được trưởng nhóm mời vào repo, làm các bước sau:
+# 1. Clone repo về máy
+git clone git@github.com:Caovannho/fire-smoke-detection.git
+
+# 2. Di chuyển vào thư mục repo
+cd fire-smoke-detection
+
+# 3. Tạo file test
+echo "# Hello" > test.txt
+
+# 4. Thêm file vào staging
+git add test.txt
+
+# 5. Commit
+git commit -m "Test commit dau tien"
+
+# 6. Push lên GitHub
+git push origin main
+Tóm tắt nhanh – Checklist cho từng thành viên
+Đã tạo tài khoản GitHub bằng email cá nhân.
+Đã cài Git và chọn nhánh mặc định là
+main
+.
+Đã chạy
+git config --global user.name
+và
+user.email
+đúng thông tin cá nhân.
+Đã kiểm tra bằng
+git config --global --list
+.
+Đã tạo SSH key và thêm vào GitHub.
+Đã kiểm tra kết nối bằng
+ssh -T git@github.com
+.
+Đã clone repo và push thử thành công.
+📌 Nếu gặp lỗi, chụp màn hình gửi vào nhóm để trưởng nhóm hỗ trợ.
+🚨 Khắc phục: Panel chat hiện Copilot
+Mở đúng Antigravity Agent thay vì "Chat with Copilot"
+⚠️ Vấn đề
+Bạn đang mở
+Copilot chat
+(panel bên phải),
+không phải
+Antigravity Agent.
+Panel này hiển thị "Chat with Copilot" và không có model selector (Claude Sonnet 4.6, GPT-5...) như mong đợi.
+Cách mở đúng Antigravity Agent
+1
+Dùng phím tắt
+Nhấn
+Ctrl
++
+Alt
++
+I
+— phím tắt
+"Open Chat"
+ghi rõ trên màn hình.
+⚠️ Chú ý: là
+Ctrl
++
+Alt
++
+I
+,
+không phải
+Ctrl
++
+L
+.
+2
+Bấm icon Antigravity ở thanh dọc bên trái
+Icon Antigravity có hình
+chữ A cách điệu
+, nằm
+dưới icon Source Control
+trong thanh hoạt động (Activity Bar) bên trái.
+3
+Dùng Command Palette
+Menu trên cùng →
+View
+→
+Command Palette
+(
+Ctrl
++
+Shift
++
+P
+) → gõ
+Antigravity
+→ chọn lệnh mở chat.
+4
+Tạo session mới từ panel Sessions
+Bấm nút
++
+ở panel
+Sessions
+bên phải → chọn
+New Antigravity Chat
+(nếu có).
+✅ Kết quả đúng
+Khi mở đúng, bạn sẽ thấy:
+Ô chat với
+model selector
+(Claude Sonnet 4.6, GPT-5...) giống ảnh trước.
+Không
+phải dòng chữ "Chat with Copilot".
+Tiêu đề panel ghi rõ
+Antigravity Agent
+hoặc tên model đang chọn.
+Phân biệt nhanh: Copilot vs Antigravity Agent
+Tiêu chí
+Copilot Chat (sai)
+Antigravity Agent (đúng)
+Tiêu đề panel
+Chat with Copilot
+Antigravity Agent / tên model
+Model selector
+✗
+Không có
+✓
+Có (Claude Sonnet 4.6, GPT-5...)
+Phím tắt
+Ctrl
++
+L
+hoặc icon Copilot
+Ctrl
++
+Alt
++
+I
+Icon
+Logo Copilot (hình tròn xanh)
+Chữ A cách điệu
+🔧 Lỗi thường gặp & cách xử lý
+Triệu chứng
+Cách xử lý
+Bấm
+Ctrl
++
+Alt
++
+I
+mà không có gì xảy ra
+Kiểm tra xem tổ hợp phím có bị trùng với phần mềm khác (ví dụ: driver đồ họa Intel, phần mềm chụp màn hình). Thử đổi phím tắt trong
+Settings → Keyboard Shortcuts
+.
+Không thấy icon Antigravity ở thanh bên trái
+Vào
+View
+→
+Extensions
+, tìm và cài đặt extension
+Antigravity
+. Sau đó khởi động lại editor.
+Command Palette gõ "Antigravity" không ra lệnh nào
+Extension Antigravity chưa được cài hoặc chưa kích hoạt. Kiểm tra lại ở mục Extensions, đảm bảo nó đang ở trạng thái
+Enabled
+.
+Panel bên phải vẫn hiện Copilot dù đã làm đúng
+Đóng panel Copilot hiện tại (bấm
+Ctrl
++
+Shift
++
+P
+→ gõ "Close Chat"), sau đó mở lại bằng
+Ctrl
++
+Alt
++
+I
+.
+Model selector không hiện Claude Sonnet 4.6 / GPT-5
+Cập nhật Antigravity extension lên bản mới nhất, đăng nhập lại tài khoản, kiểm tra quyền truy cập model trong Settings.
+📌 Nếu đã làm đủ 4 cách mà vẫn hiện Copilot, hãy chụp màn hình panel + thanh bên trái gửi vào nhóm để được hỗ trợ.
+📁 Cấu trúc Project đầy đủ
+fire-smoke-detection — Sơ đồ thư mục & phân công cho từng thành viên
+Cây thư mục
+fire-smoke-detection/
+│
+├──
+data.yaml
+← Cấu hình dataset (cùng cấp data/)
+├──
+pipeline.py
+← TV1: đọc video/webcam, gọi detectors
+├──
+config.py
+← Hằng số chung (FRAME_WIDTH, LABELS...)
+├──
+requirements.txt
+← Danh sách thư viện
+├──
+.gitignore
+← File bỏ qua khi push Git
+├──
+README.md
+← Hướng dẫn cài đặt + phân công
+│
+├──
+data/
+← Dataset (KHÔNG push Git, để trên Drive)
+│   ├──
+train/
+│   │   ├──
+images/
+← Ảnh train (~14.122)
+│   │   └──
+labels/
+← Nhãn YOLO .txt
+│   ├──
+val/
+│   │   ├──
+images/
+│   │   └──
+labels/
+│   ├──
+test/
+│   │   ├──
+images/
+│   │   └──
+labels/
+│   └──
+README.md
+← Link Google Drive dataset
+│
+├──
+traditional/
+← Phương pháp truyền thống (OpenCV)
+│   ├──
+__init__.py
+│   ├──
+preprocess.py
+← TV2: resize, lọc, cân bằng sáng
+│   ├──
+fire_detect.py
+← TV2: phát hiện lửa (HSV + hình thái học)
+│   └──
+smoke_detect.py
+← TV3: phát hiện khói (trừ nền MOG2)
+│
+├──
+yolo/
+← Phương pháp Deep Learning
+│   ├──
+__init__.py
+│   ├──
+yolo_detect.py
+← TV4: gọi YOLO detect
+│   ├──
+train.py
+← TV4: script huấn luyện
+│   └──
+weights/
+← Weights .pt (KHÔNG push Git)
+│       └──
+.gitkeep
+│
+├──
+eval/
+← Bộ đánh giá chung
+│   ├──
+__init__.py
+│   └──
+evaluate.py
+← TV2: Precision, Recall, F1, FPS
+│
+├──
+gui/
+← Giao diện + cảnh báo
+│   ├──
+__init__.py
+│   ├──
+app.py
+← TV1: GUI (Tkinter)
+│   └──
+alert.py
+← TV1: logic cảnh báo N khung liên tiếp
+│
+└──
+report/
+← Báo cáo + slide (TV3 tổng hợp)
+├──
+chapters/
+← Từng chương .docx
+├──
+images/
+← Hình minh họa
+└──
+slides/
+← File PowerPoint
+⚠️ Quan trọng: vị trí của data.yaml
+File
+data.yaml
+phải nằm
+cùng cấp với folder
+data/
+, tức là ở
+project root
+, không nằm trong
+data/
+.
+fire-smoke-detection/
+├── data.yaml          ← ĐÚNG: cùng cấp với data/
+├── data/
+│   ├── train/
+│   ├── val/
+│   └── test/
+└── ...
+Nếu
+data.yaml
+nằm trong
+data/
+thì phải di chuyển ra:
+mv data/data.yaml ./data.yaml
+📥 Hướng dẫn tải và setup dataset
+Bước 1: Tải dataset
+Tải file
+archive.zip
+từ link Google Drive trong
+data/README.md
+.
+Giải nén → bên trong có cấu trúc
+archive/data/{train,val,test}/
+.
+Bước 2: Copy vào project
+Copy toàn bộ nội dung thư mục
+data/
+bên trong
+archive/
+vào
+data/
+của project.
+Copy file
+data.yaml
+từ
+archive/
+ra
+project root
+(cùng cấp với folder
+data/
+).
+Bước 3: Kiểm tra cấu trúc sau khi copy
+fire-smoke-detection/
+├──
+data.yaml
+← File cấu hình, cùng cấp với data/
+└──
+data/
+├──
+train/
+│   ├──
+images/
+← ~14.122 ảnh
+│   └──
+labels/
+← ~14.122 file .txt
+├──
+val/
+│   ├──
+images/
+← ~3.099 ảnh
+│   └──
+labels/
+├──
+test/
+│   ├──
+images/
+← ~4.306 ảnh
+│   └──
+labels/
+└──
+README.md
+Bước 4: Cấu hình data.yaml
+Mở file
+data.yaml
+ở
+project root
+, thay
+toàn bộ nội dung
+bằng:
+# Dataset D-Fire
+path: ./data
+train: train/images
+val: val/images
+test: test/images
+
+nc: 2
+names: ['smoke', 'fire']
+🔹 Giải thích từng dòng:
+path: ./data
+→ trỏ đến folder
+data/
+(cùng cấp với file
+data.yaml
+).
+train: train/images
+→ đường dẫn ảnh train:
+data/train/images
+.
+val: val/images
+→ đường dẫn ảnh validation:
+data/val/images
+.
+test: test/images
+→ đường dẫn ảnh test:
+data/test/images
+.
+nc: 2
+→ số class = 2.
+names: ['smoke', 'fire']
+→
+0 = smoke
+,
+1 = fire
+(theo đúng thứ tự D-Fire).
+Bước 5: Kiểm tra dataset sau khi setup
+python -c "
+import os
+for split in ['train', 'val', 'test']:
+    d = f'data/{split}/labels'
+    files = os.listdir(d)
+    empty = [f for f in files if os.path.getsize(os.path.join(d, f)) == 0]
+    print(f'{split}: {len(files)} files, {len(empty)} rỗng (None), {len(files)-len(empty)} có nhãn')
+"
+Kết quả mong đợi:
+train: 14122 files, 6458 rỗng (None), 7664 có nhãn
+val: 3099 files, 1375 rỗng (None), 1724 có nhãn
+test: 4306 files, 2005 rỗng (None), 2301 có nhãn
+💡 Lưu ý về file label rỗng:
+D-Fire có ~46% ảnh "None" (không có lửa/khói). Đây là
+negative samples
+giúp model phân biệt lửa thật với áo đỏ, đèn vàng, hoàng hôn. File label rỗng (0 KB) là
+đúng thiết kế
+, không phải lỗi.
+Tổng hợp ai làm file nào
+File / Folder
+Mô tả
+Phụ trách
+data.yaml
+Cấu hình dataset (project root)
+TV1
+data/
+Dataset D-Fire (train/val/test)
+TV1
+tải + chia sẻ
+traditional/preprocess.py
+Resize, lọc, cân bằng sáng
+TV2
+traditional/fire_detect.py
+Phát hiện lửa (HSV + hình thái học)
+TV2
+traditional/smoke_detect.py
+Phát hiện khói (trừ nền MOG2)
+TV3
+yolo/yolo_detect.py
+Gọi YOLO detect
+TV4
+yolo/train.py
+Script huấn luyện YOLO
+TV4
+eval/evaluate.py
+Precision, Recall, F1, FPS
+TV2
+gui/app.py
+Giao diện GUI
+TV1
+gui/alert.py
+Logic cảnh báo N khung liên tiếp
+TV1
+report/
+Báo cáo + slide
+TV3
+tổng hợp
+pipeline.py
+Đọc video/webcam, gọi detectors
+TV1
+config.py
+Hằng số chung (FRAME_WIDTH, LABELS...)
+TV1
+Lưu ý quan trọng
+⚠️ Không push lên Git:
+data/
+— Dataset để trên Google Drive, chỉ giữ
+README.md
+trong repo.
+yolo/weights/
+— File
+.pt
+nặng, để trên Drive, chỉ giữ
+.gitkeep
+.
+archive.zip
+— File nén gốc, không push.
+💡 Mẹo:
+Mỗi thư mục cần có file
+__init__.py
+(rỗng) để Python import module dễ dàng.
+File
+.gitkeep
+dùng để Git theo dõi thư mục rỗng.
+Ghi link Google Drive dataset vào
+data/README.md
+để cả nhóm truy cập.
+Cập nhật
+requirements.txt
+mỗi khi cài thư viện mới:
+pip freeze > requirements.txt
+.
+📌 Cấu trúc này đã được chốt. Mọi thay đổi cần thông báo trong nhóm trước khi thực hiện.
+📚 Tài liệu nhóm – Fire & Smoke Detection · Cập nhật đầy đủ 4 phần

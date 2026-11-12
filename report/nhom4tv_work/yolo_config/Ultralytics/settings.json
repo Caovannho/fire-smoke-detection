@@ -1,0 +1,19 @@
+{
+  "settings_version": "0.0.8",
+  "datasets_dir": "C:\\HOCTAP_VALAMVIEC\\Hoc Tap\\fire-smoke-detection\\datasets",
+  "weights_dir": "weights",
+  "runs_dir": "runs",
+  "uuid": "51ffc8644d8aa78476179792d244d57764b4658a07adc08f7c034c353d11552b",
+  "sync": true,
+  "api_key": "",
+  "openai_api_key": "",
+  "clearml": true,
+  "comet": true,
+  "dvc": true,
+  "mlflow": true,
+  "raytune": true,
+  "tensorboard": false,
+  "wandb": false,
+  "vscode_msg": true,
+  "openvino_msg": true
+}

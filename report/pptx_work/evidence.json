@@ -1,0 +1,1 @@
+{"fire_image": "WEB10532.jpg", "fire_detections": [145, 114, 80, 37, "smoke", 0.6618], "smoke": [{"video": "253436_medium.mp4", "frame_index": 31, "detections": [[145, 114, 80, 37, "smoke", 0.6618]]}]}

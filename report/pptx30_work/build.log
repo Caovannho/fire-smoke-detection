@@ -1,0 +1,4 @@
+[artifact-tool] embedded_font_face_mismatch: Decoded font reports weight 700 and italic=false, which does not match the authored regular face (expected weight 300-500 and italic=false).
+[artifact-tool] embedded_font_temp_file_failed: EPERM: operation not permitted, rename 'C:\Users\PC\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{03620370-a3e6-49db-ad74-b132a62fa601}\Temp\artifact-tool-embedded-fonts-GiqcBc\embedded-font-4e0c98ebc471e96cb28aa8f2da0f5bf09f92cbe55b216df81c4017919abbf997.ttf.5cfc299d-6bce-4fbb-87fe-4d0c4206b9de.tmp' -> 'C:\Users\PC\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{03620370-a3e6-49db-ad74-b132a62fa601}\Temp\artifact-tool-embedded-fonts-GiqcBc\embedded-font-4e0c98ebc471e96cb28aa8f2da0f5bf09f92cbe55b216df81c4017919abbf997.ttf'
+Inspect result written to file: C:\HOCTAP_VALAMVIEC\Hoc Tap\fire-smoke-detection\report\pptx30_work\candidate.pptx.inspect.ndjson
+Built 30

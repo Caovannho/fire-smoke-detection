@@ -1,0 +1,40 @@
+{
+  "commit": "40ea155fb9ecab6bcfb97b04cebab6d6c0a4dd0b",
+  "dataset": {
+    "train": {
+      "images": 14122,
+      "labels": 14122,
+      "none": 6458,
+      "smoke_only": 3836,
+      "fire_only": 770,
+      "both": 3058,
+      "invalid": 0
+    },
+    "val": {
+      "images": 3099,
+      "labels": 3099,
+      "none": 1375,
+      "smoke_only": 845,
+      "fire_only": 174,
+      "both": 705,
+      "invalid": 0
+    },
+    "test": {
+      "images": 4306,
+      "labels": 4306,
+      "none": 2005,
+      "smoke_only": 1186,
+      "fire_only": 220,
+      "both": 895,
+      "invalid": 0
+    }
+  },
+  "sound": {
+    "rate": 44100,
+    "channels": 1,
+    "sample_width": 2,
+    "duration": 1.3499319727891157
+  },
+  "weights_bytes": 6487139,
+  "weights_sha256": "73542b2f7847dc7c5b2ff9c456d24b3b37365af2d72bf05c288f641ddbcd8503"
+}

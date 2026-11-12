@@ -1,0 +1,26 @@
+[artifact-tool] embedded_font_face_mismatch: Decoded font reports weight 700 and italic=false, which does not match the authored regular face (expected weight 300-500 and italic=false).
+[artifact-tool] embedded_font_temp_file_failed: EPERM: operation not permitted, rename 'C:\Users\PC\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{2fd4ea03-bbbc-492f-8497-bea27671f20d}\Temp\artifact-tool-embedded-fonts-4z6xWf\embedded-font-4e0c98ebc471e96cb28aa8f2da0f5bf09f92cbe55b216df81c4017919abbf997.ttf.4091dcda-6a58-4a1b-ada8-57e25dd7f52e.tmp' -> 'C:\Users\PC\AppData\Local\Packages\openai.codex_2p2nqsd0c76g0\AC\#!sandbox.{2fd4ea03-bbbc-492f-8497-bea27671f20d}\Temp\artifact-tool-embedded-fonts-4z6xWf\embedded-font-4e0c98ebc471e96cb28aa8f2da0f5bf09f92cbe55b216df81c4017919abbf997.ttf'
+node:internal/modules/cjs/loader:1564
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module '#standard-fonts/Helvetica'
+Require stack:
+- C:\Program Files\WindowsApps\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\dependencies\node\node_modules\@oai\artifact-tool\dist\artifact_tool.mjs
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)
+    at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)
+    at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)
+    at Module._load (node:internal/modules/cjs/loader:1341:5)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.require (node:internal/modules/cjs/loader:1674:12)
+    at require (node:internal/modules/helpers:157:16)
+    at Helvetica (file:///C:/Program%20Files/WindowsApps/OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt/dependencies/node/node_modules/@oai/artifact-tool/dist/artifact_tool.mjs:165:5455)
+    at K0o (file:///C:/Program%20Files/WindowsApps/OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt/dependencies/node/node_modules/@oai/artifact-tool/dist/artifact_tool.mjs:116:792) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Program Files\\WindowsApps\\OpenAI.CodexPrimaryRuntime.v26-1105-1297-0_26.1105.1297.0_x64__3k8sg7r9htsxt\\dependencies\\node\\node_modules\\@oai\\artifact-tool\\dist\\artifact_tool.mjs'
+  ]
+}
+
+Node.js v24.22.1

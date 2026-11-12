@@ -1,0 +1,2 @@
+report/pptx30_work/deck.proto.json filter=lfs diff=lfs merge=lfs -text
+report/pptx_work/draft.proto.json filter=lfs diff=lfs merge=lfs -text

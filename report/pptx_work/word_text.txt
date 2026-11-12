@@ -1,0 +1,1051 @@
+-334645-23050500  
+BỘ CÔNG THƯƠNG
+TRƯỜNG ĐH CÔNG THƯƠNG THÀNH PHỐ HỒ CHÍ MINH
+BỘ MÔN: KHOA HỌC DỮ LIỆU
+
+
+
+BÀI TẬP NHÓM
+HỌC PHẦN: XỬ LÝ ẢNH SỐ
+
+ĐỀ TÀI: PHÁT HIỆN CHÁY VÀ KHÓI TỪ CAMERA
+
+Giảng viên hướng dẫn: Đỗ Trung Dũng
+Lớp học phần: 15DHKHDL02 - 010110304702
+Sinh viên thực hiện:
+Phạm Tấn Dương – 2045240060
+Nguyễn Quốc Khang – 2045240119
+Nguyễn Viết Khánh – 2045240128
+Cao Văn Nho – 2045240213
+
+
+
+
+
+
+Tp. HCM, tháng 10 năm 2026
+
+
+
+
+
+
+
+NHẬT KÝ LÀM VIỆC CỦA NHÓM
+
+Lớp học phần: 15DHKHDL02   
+
+
+STT
+
+Họ và tên
+
+MSSV
+
+Vai trò
+
+Công việc thực hiện
+
+Sản phẩm bàn giao
+TV1Nhóm trưởng
+Cao Văn Nho
+2045240213
+Quản lý, Pipeline, GUI, cảnh báo
+Quản lý tiến độ; thu thập và phân chia dữ liệu; xây dựng Pipeline; thiết kế GUI; tích hợp thuật toán và cảnh báo; kiểm thử tổng thể.
+pipeline.py, gui/app.py, gui/alert.py, assets/alarm.wav, ứng dụng tích hợp
+TV2
+Nguyễn Quốc Khang
+2045240119
+Tiền xử lý, phát hiện lửa truyền thống, đánh giá
+Tiền xử lý ảnh; nghiên cứu và triển khai phát hiện lửa truyền thống; xây dựng công cụ đánh giá.
+preprocess.py, fire_detect.py, evaluate.py,
+kết quả đánh giá
+TV3
+Phạm Tấn Dương
+2045240060
+Phát hiện khói truyền thống, báo cáo
+Phát hiện khói bằng MOG2, màu sắc, hình dạng và chuyển động; phân tích nhiễu, báo động giả; tổng hợp báo cáo Word và slide.
+smoke_detect.py, bảng phân tích lỗi, báo cáo Word, PowerPoint
+TV4
+Nguyễn Viết Khánh
+2045240128
+
+YOLOv8, gán nhãn, so sánh
+Điều phối gán nhãn; huấn luyện YOLOv8 phát hiện lửa và khói; tối ưu tham số; xây dựng detect(frame); thử nghiệm Hybrid và so sánh phương pháp.
+yolo_detect.py, best.pt,
+kết quả huấn luyện,
+biểu đồ so sánh
+
+Nhóm trưởng
+Cao Văn Nho
+
+NHẬN XÉT CỦA GIẢNG VIÊN VỀ BÀI TIỂU LUẬN NHÓM
+
+Tiêu chí đánh giá
+
+Điểm
+Tổng điểm
+Cấu trúc hợp lý và hình thức trình bày 
+
+
+
+Nội dung đầy đủ
+Các nội dung thành phần
+45%
+
+
+
+Lập luận
+30%
+
+
+
+Kết luận
+25%
+
+
+
+
+BẢNG TỔNG HỢP
+MỨC ĐỘ ĐÓNG GÓP VÀ ĐIỂM CỦA CÁC THÀNH VIÊN TRONG NHÓM
+
+TT
+Họ và tên
+(ghi theo thứ tự ABC)
+Mức độ đóng góp
+(do cả nhóm thống nhất)
+Mức độ đóng góp
+(do GV đánh giá)
+Điểm cá nhân trong LV nhóm
+Điểm tiểu luận của cá nhân (GV)
+1
+Phạm Tấn Dương
+100%
+
+
+
+2
+Nguyễn Quốc Khang
+100%
+
+
+
+3
+Nguyễn Viết Khánh
+100%
+
+
+
+4
+Cao Văn Nho
+100%
+
+
+
+
+
+TÓM TẮT ĐỀ TÀI
+Đồ án xây dựng một nguyên mẫu phát hiện lửa và khói từ camera, do nhóm bốn thành viên thực hiện. Hệ thống gồm các detector truyền thống, nhánh YOLOv8 và Phương pháp Hybrid, cùng phần kiến trúc, Pipeline, giao diện Tkinter, xử lý đa luồng và cảnh báo. Người dùng có thể phân tích một ảnh tĩnh hoặc giám sát liên tục một nguồn video; kết quả hiện ra dưới dạng hộp bao, nhãn và điểm số cho từng phương pháp.
+Qua thử nghiệm, phương pháp truyền thống còn nhạy với nhiễu màu; Combined dạng union có thể giữ lại các vùng nhận diện sai. Cơ chế xác nhận qua năm khung hình liên tiếp và cooldown ba giây giúp hạn chế cảnh báo thoáng qua, nhưng chưa xử lý được nhiễu kéo dài.
+Báo cáo trình bày các chỉ số Precision, Recall, F1 và FPS theo đúng bộ dữ liệu và cách đo đã sử dụng. Sản phẩm được xây dựng phục vụ học tập, nghiên cứu và minh họa hệ thống giám sát bằng camera.
+
+MỤC LỤC
+CHƯƠNG 1 TỔNG QUAN ĐỀ TÀI1
+1.1 Bối cảnh và bài toán nghiên cứu1
+1.2 Vai trò bổ trợ cho cảm biến và giới hạn an toàn1
+1.3 Mục tiêu và câu hỏi cần trả lời1
+1.4 Phạm vi chức năng đã triển khai2
+1.5 Công nghệ và tổ chức phát triển2
+1.6 Phương pháp tiếp cận và tiêu chí hoàn thành2
+CHƯƠNG 2 CƠ SỞ LÝ THUYẾT3
+2.1 Biểu diễn ảnh và không gian màu3
+2.2 Lọc nhiễu và tăng tương phản4
+2.3 Hình thái học và thành phần liên thông5
+2.4 Chuyển động và mô hình nền5
+2.5 Phát hiện đối tượng bằng học sâu6
+2.6 Hộp bao và độ giao nhau6
+2.7 Thước đo ở mức hộp và mức ảnh7
+2.8 Tính đáp ứng và đồng thời trong ứng dụng desktop7
+CHƯƠNG 3 PHÂN TÍCH VÀ THIẾT KẾ KIẾN TRÚC HỆ THỐNG9
+3.1 Yêu cầu chức năng và tiêu chí chấp nhận9
+3.2 Kiến trúc module và luồng phụ thuộc9
+3.3 Giao diện detector và hợp đồng dữ liệu10
+3.4 Thiết kế các chế độ nhận diện11
+3.5 Hệ tọa độ và nguyên tắc giữ tỷ lệ11
+3.6 Thiết kế phiên xử lý và quyền sở hữu tài nguyên12
+3.7 Cấu hình tập trung và sự khác nhau giữa tham số13
+3.8 Quản lý lỗi và cấu trúc bàn giao14
+CHƯƠNG 4 TIỀN XỬ LÝ VÀ PHÁT HIỆN LỬA TRUYỀN THỐNG15
+4.1 Phương pháp phát hiện lửa truyền thống và cấu trúc thuật toán15
+4.2 Các hàm tiền xử lý và lựa chọn mặc định15
+4.3 Mặt nạ màu lửa và lõi sáng16
+4.4 Hình thái học và lọc hình học17
+4.5 Cách tính điểm vùng lửa18
+4.6 Đặc trưng nhấp nháy và trạng thái hiện hành18
+4.7 Bằng chứng ablation và cách diễn giải18
+4.8 Nhiễu màu da và đề xuất có thể kiểm chứng19
+CHƯƠNG 5 PHÁT HIỆN KHÓI TRUYỀN THỐNG20
+5.1 Phương pháp phát hiện khói truyền thống và đặc trưng của khói20
+5.2 Lựa chọn miền màu khói20
+5.3 MOG2 và xác thực chuyển động trong contour21
+5.4 Hình thái học và kiểm tra kích thước22
+5.5 Mật độ cạnh và xu hướng bốc lên22
+5.6 Tổng hợp điểm heuristic của khói23
+5.7 Chế độ ảnh tĩnh và quản lý trạng thái23
+CHƯƠNG 6 PHÁT HIỆN LỬA VÀ KHÓI BẰNG YOLOV824
+6.1 Phương pháp phát hiện bằng YOLOv8 và chuỗi học sâu24
+6.2 Dữ liệu D Fire và cấu trúc nhãn24
+6.3 Huấn luyện và các siêu tham số trong mã25
+6.4 Tăng cường dữ liệu và rủi ro thay đổi phân phối26
+6.5 Nạp model và xác thực nhãn trong tích hợp26
+6.6 Suy luận và chuyển đổi kết quả27
+6.7 Phương pháp Hybrid và khác biệt so với Combined27
+6.8 Tổng hợp thực nghiệm và kết quả YOLOv828
+CHƯƠNG 7 XÂY DỰNG PIPELINE GUI VÀ HỆ THỐNG CẢNH BÁO29
+7.1 Phạm vi xây dựng và tích hợp hệ thống29
+7.2 Quy trình xử lý nguồn liên tục29
+7.3 Chế độ Image và xử lý đường dẫn tiếng Việt30
+7.4 Bố cục giao diện và phản hồi người dùng31
+7.5 Queue luồng chính và worker31
+7.6 Dừng khởi động lại và chuyển nguồn32
+7.7 Quy tắc năm khung hình liên tiếp32
+7.8 Cooldown và trạng thái cảnh báo33
+7.9 Âm thanh bất đồng bộ và khóa đồng bộ34
+7.10 Tài nguyên WAV và phương án dự phòng34
+7.11 FPS hiệu năng và quản lý bộ nhớ34
+CHƯƠNG 8 THỰC NGHIỆM ĐÁNH GIÁ VÀ SO SÁNH PHƯƠNG PHÁP35
+8.1 Thiết kế bằng chứng và phiên bản khảo sát35
+8.2 Môi trường phần mềm và dữ liệu quan sát35
+8.3 Giao thức đánh giá mức hộp35
+8.4 Đánh giá mức ảnh và báo động giả36
+8.5 Kết quả so sánh đang lưu trong repository36
+8.6 Ablation tiền xử lý truyền thống37
+8.7 Ablation các bước lọc lửa38
+8.8 Kiểm tra ảnh thật trong ba chế độ39
+8.9 Trường hợp nhận nhầm người và vai trò của Combined41
+8.10 Điều kiện so sánh giữa các phương pháp41
+CHƯƠNG 9 KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN42
+9.1 Kết quả đạt được của toàn nhóm42
+9.2 Ý nghĩa của các kết quả đánh giá42
+9.3 Hạn chế kỹ thuật và giới hạn triển khai42
+PHỤ LỤC A DANH MỤC MODULE VÀ CẤU HÌNH43
+A.1 Các file và trách nhiệm chính43
+A.2 Từ viết tắt và ký hiệu43
+PHỤ LỤC B MÃ NGUỒN MINH HỌA45
+B.1 Kiểm tra hợp đồng kết quả detector45
+B.2 Xử lý tọa độ ảnh45
+B.3 Thuật toán lửa truyền thống46
+B.4 Quy tắc cảnh báo thuộc hệ thống tích hợp47
+TÀI LIỆU THAM KHẢO49
+
+DANH MỤC HÌNH
+Hình 1  Thứ tự kênh RGB và BGR của cùng một pixel3
+Hình 2  Các thành phần H S V và miền giá trị uint8 OpenCV4
+Hình 3  Gaussian và Median trên ảnh tổng hợp có nhiễu4
+Hình 4  Minh họa tác dụng của opening và closing trên mặt nạ tổng hợp5
+Hình 5  Các tầng chức năng của mô hình YOLOv8 trong ứng dụng6
+Hình 6  Quan hệ giữa hai hộp bao và vùng giao nhau7
+Hình 7  Kiến trúc chức năng và trách nhiệm của bốn thành viên10
+Hình 8  Phân biệt Traditional YOLO Combined và Hybrid11
+Hình 9  Letterbox và ánh xạ hộp bao từ ảnh xử lý về ảnh gốc12
+Hình 10  Vòng đời phiên xử lý và điều kiện chuyển trạng thái13
+Hình 11  Các bước phát hiện lửa truyền thống truyền thống15
+Hình 12  Ảnh đầu vào và các mặt nạ trung gian của detector lửa17
+Hình 13  Chuỗi phát hiện khói và xác thực chuyển động theo vùng20
+Hình 14  Minh họa kiểm tra chuyển động trong contour khói22
+Hình 15  Ảnh và bounding box từ nhãn gốc của dataset25
+Hình 16  Quy trình huấn luyện và suy luận trong mã nguồn26
+Hình 17  Cơ chế bỏ qua YOLO và xác nhận vùng trong Hybrid hiện tại28
+Hình 18  Luồng xử lý webcam video và Camera IP trong GUI30
+Hình 19  Đường đi riêng của xem trước và nhận diện ảnh tĩnh30
+Hình 20  Trao đổi dữ liệu giữa worker và main thread31
+Hình 21  Điều kiện kích hoạt và dừng âm thanh cảnh báo34
+Hình 22  Các giá trị Precision Recall và F1 trong comparison_summary.json37
+Hình 23  Đối chiếu ảnh AoF07738 giữa các phương pháp40
+Hình 24  Ví dụ khói mà YOLO chưa phát hiện trong lượt kiểm tra40
+Hình 25  Ví dụ âm tính có cảnh báo khói từ Traditional và Combined41
+
+
+DANH MỤC BẢNG
+Bảng 1  Yêu cầu chức năng và bằng chứng cần có9
+Bảng 2  Đầu ra detector10
+Bảng 3  Các cấu hình chung đang dùng13
+Bảng 4  Các hàm tiền xử lý truyền thống15
+Bảng 5  Tham số lửa thực tế trong PARAMS17
+Bảng 6  Các nhóm tham số khói đang dùng21
+Bảng 7  Thống kê dữ liệu local theo file nhãn25
+Bảng 8  Ba preset huấn luyện có trong train.py26
+Bảng 9  Ví dụ logic chuỗi năm frame không phải số đo thực nghiệm33
+Bảng 10  Phân loại nguồn bằng chứng sử dụng trong báo cáo35
+Bảng 11  Kết quả lưu sẵn với 100 ảnh mỗi phương pháp36
+Bảng 12  Ablation tiền xử lý đang lưu38
+Bảng 13  Ablation các bước lọc lửa đang lưu38
+Bảng 14  Kết quả từng mẫu trong kiểm tra tích hợp39
+Bảng 15  Các module thực tế43
+Bảng 16  Các ký hiệu và từ viết tắt43
+
+
+CHƯƠNG 1 TỔNG QUAN ĐỀ TÀI
+1.1 Bối cảnh và bài toán nghiên cứu
+Phát hiện lửa và khói từ camera là bài toán tìm trong ảnh những vùng có dấu hiệu cháy để người vận hành kiểm tra lại. Một khung hình có thể có cả ngọn lửa, khói và nhiều vật gây nhiễu, nên hệ thống phải xác định được có đối tượng hay không và đối tượng nằm ở đâu. Kết quả của đồ án là các hộp bao gắn nhãn fire hoặc smoke cùng điểm số của phương pháp phát hiện. Hộp bao chỉ mô tả vùng nhìn thấy trong ảnh, không cho biết nhiệt độ, nồng độ khí hay mức nguy hiểm thực tế của đám cháy.
+Camera quan sát được vùng rộng và cho phép xem lại bối cảnh khi có cảnh báo, nhưng khả năng này phụ thuộc vào ánh sáng, góc nhìn, chất lượng truyền hình ảnh và vật che khuất. Khói nằm ngoài tầm nhìn hoặc lửa bị che kín thì không thể suy ra đáng tin từ một ảnh RGB. Vì thế nhóm xác định sản phẩm là nguyên mẫu hỗ trợ giám sát và nghiên cứu thị giác máy tính, chưa đủ điều kiện thay thế thiết bị báo cháy chuyên dụng.
+1.2 Vai trò bổ trợ cho cảm biến và giới hạn an toàn
+Cảm biến nhiệt, cảm biến khói và camera dựa trên những đại lượng vật lý khác nhau. Camera ghi nhận hình ảnh trong vùng quan sát, còn cảm biến vật lý phản ứng với các dấu hiệu theo cơ chế riêng. Hệ thống camera trong đồ án vì vậy đóng vai trò bổ sung bằng chứng trực quan và tạo môi trường so sánh các thuật toán nhận diện.
+Ảnh ngọn lửa hiển thị trên điện thoại có thể khiến detector gán nhãn fire dù trước camera không có đám cháy nào. Khi đó phần mềm chỉ nhận ra đặc trưng hình ảnh của lửa. Muốn phân biệt màn hình phát video với cháy thật cần thêm dữ liệu, dấu hiệu hình học hoặc một loại cảm biến khác. Vì vậy, mọi cảnh trình diễn trong báo cáo đều được gọi đúng là ảnh hoặc video lửa trên màn hình, không coi là thử nghiệm đám cháy thật.
+1.3 Mục tiêu và câu hỏi cần trả lời
+Mục tiêu chung là xây dựng ứng dụng nhận đầu vào từ webcam, video, Camera IP và ảnh tĩnh, chạy được detector truyền thống hoặc YOLOv8, vẽ hộp bao lên kết quả và quản lý cảnh báo với nguồn liên tục. Ngoài phần ứng dụng, đồ án so sánh luật màu với mô hình học sâu, xem xét ảnh hưởng của tiền xử lý và cách gộp kết quả, đồng thời đánh giá giới hạn của việc dùng nhiều khung hình liên tiếp để giảm cảnh báo thoáng qua.
+Nhóm tập trung vào bốn câu hỏi: tiền xử lý và hình thái học ảnh hưởng thế nào đến Precision và Recall; đặc trưng chuyển động có hỗ trợ phát hiện khói hay không; cách kết hợp Combined tác động ra sao đến báo động giả; và tốc độ nhận diện khác gì FPS hiển thị trên GUI. Những câu hỏi này được làm rõ bằng cấu trúc thuật toán, kết quả đánh giá và các tình huống thử nghiệm ở Chương 8.
+1.4 Phạm vi chức năng đã triển khai
+Phiên bản được mô tả là commit 40ea155 của repository Caovannho/fire-smoke-detection. Đường dẫn repository: https://github.com/Caovannho/fire-smoke-detection.
+GUI có bốn loại nguồn và ba phương pháp để chọn là traditional, yolo và combined; dòng lệnh của pipeline hỗ trợ thêm hybrid. Ảnh tĩnh chỉ được xem trước và nhận diện một lần, không chạy vòng lặp video và không bật còi. Nguồn liên tục gồm webcam theo chỉ số, đường dẫn video và chuỗi địa chỉ mà OpenCV mở được.
+1.5 Công nghệ và tổ chức phát triển
+Nhóm sử dụng Python trong môi trường Conda fire-smoke trên Windows để chạy và kiểm tra ứng dụng. OpenCV đọc nguồn và xử lý ảnh, NumPy lưu dữ liệu ảnh, Pillow chuyển ảnh để hiển thị, Tkinter dựng giao diện, threading và queue tổ chức việc trao đổi giữa các luồng, PyTorch và Ultralytics phục vụ phần học sâu. 
+1.6 Phương pháp tiếp cận và tiêu chí hoàn thành
+Mã nguồn cho biết hành vi đã triển khai, còn file JSON và CSV cung cấp số liệu truy vết được
+CHƯƠNG 2 CƠ SỞ LÝ THUYẾT
+2.1 Biểu diễn ảnh và không gian màu
+Ảnh màu là mảng ba chiều H × W × 3. OpenCV đọc ảnh theo thứ tự BGR, trong khi nhiều thư viện hiển thị dùng RGB. Đổi thứ tự này không làm thay đổi kích thước ảnh nhưng đảo quan hệ giữa màu đỏ và xanh, nên ngưỡng thiết kế cho BGR mà áp vào RGB sẽ cho mặt nạ khác hẳn. Pipeline giữ ảnh ở dạng BGR trong suốt đoạn suy luận và chỉ đổi sang RGB trước khi tạo ảnh Pillow để hiển thị.
+
+Hình 1  Thứ tự kênh RGB và BGR của cùng một pixel
+HSV tách màu thành hue, saturation và value, tương ứng sắc độ, độ bão hòa và độ sáng. Với ảnh uint8 của OpenCV, H nằm trong khoảng 0 đến 179, còn S và V từ 0 đến 255. Một ngưỡng HSV chỉ chọn ra tập pixel hợp với quy tắc màu, chưa chứng minh pixel đó thuộc vật thể đang cháy: da người, gỗ, áo cam và nguồn sáng đều có thể rơi vào cùng miền màu. 
+
+Hình 2  Các thành phần H S V và miền giá trị uint8 OpenCV
+M(x,y) = 1 nếu Hmin ≤ H(x,y) ≤ Hmax và Smin ≤ S(x,y) ≤ Smax và Vmin ≤ V(x,y) ≤ Vmax
+2.2 Lọc nhiễu và tăng tương phản
+Bộ lọc Gaussian làm trơn ảnh bằng tổng có trọng số trong lân cận, pixel càng gần tâm trọng số càng lớn. Median lấy trung vị của lân cận, hữu ích khi ảnh có điểm sáng hoặc tối bất thường. Cả hai đều có thể làm biến dạng vùng lửa nhỏ hay biên của khói. 
+CLAHE cân bằng histogram theo từng vùng cục bộ và giới hạn mức khuếch đại tương phản. Phép này tác động lên kênh V rồi đưa ảnh từ HSV về BGR. Khi độ sáng cục bộ tăng, một số pixel vượt ngưỡng V của detector, làm tăng số ứng viên nhưng cũng sinh thêm báo động giả. Mọi phép tiền xử lý trong mã đều tắt được bằng giá trị 0, thuận lợi cho thí nghiệm ablation ở chương 8.
+
+Hình 3  Gaussian và Median trên ảnh tổng hợp có nhiễu
+Iout(x,y) = Σu Σv G(u,v) I(x-u,y-v)
+2.3 Hình thái học và thành phần liên thông
+Co và giãn làm thay đổi hình dạng vùng trắng trên ảnh nhị phân theo phần tử cấu trúc. Opening là co rồi giãn, thường loại bỏ các vùng nhỏ; closing là giãn rồi co, có thể nối khe hở hoặc lấp lỗ nhỏ. Hiệu quả thực tế phụ thuộc vào kích thước kernel so với đối tượng: kernel phù hợp với ảnh 640 × 480 có thể xóa mất đối tượng khi dùng cho ảnh có độ phân giải khác.
+Contour là đường biên của một vùng liên thông trên mặt nạ, từ đó tính được diện tích và hộp chữ nhật bao ngoài. Hai diện tích này khác nhau vì hộp bao còn chứa cả phần nền không thuộc vùng ứng viên. Một vùng rỗng hoặc có biên phức tạp vì thế vẫn có thể cho hộp lớn, và score tính theo số pixel màu nằm trong hộp cũng chưa phải xác suất phân loại đã hiệu chuẩn.
+Opening(M,K) = (M ⊖ K) ⊕ K
+Closing(M,K) = (M ⊕ K) ⊖ K
+
+Hình 4  Minh họa tác dụng của opening và closing trên mặt nạ tổng hợp
+2.4 Chuyển động và mô hình nền
+Trừ nền dùng lịch sử các khung hình để ước lượng phần tương đối ổn định, sau đó coi những pixel khác biệt là tiền cảnh. MOG2 mô hình hóa sự biến thiên tại từng pixel bằng hỗn hợp các phân phối Gaussian. Khi camera đứng yên, phương pháp loại bớt được những vùng xám tĩnh. Nếu camera rung, phơi sáng thay đổi hoặc có vật thể mới đi vào thì tiền cảnh tăng mạnh dù không liên quan đến khói.
+Optical Flow mô tả dịch chuyển biểu kiến của cường độ ảnh giữa các thời điểm, thường dựa trên giả thiết độ sáng cục bộ được bảo toàn. Đây là một hướng phân tích chuyển động khác.
+I(x,y,t) ≈ I(x+u,y+v,t+Δt)
+2.5 Phát hiện đối tượng bằng học sâu
+Mô hình phát hiện đối tượng học cách ánh xạ từ ảnh sang vị trí và lớp của đối tượng. Họ YOLO dự đoán theo hướng một giai đoạn, xử lý định vị và phân loại trong cùng một lần suy luận. Công trình YOLO gốc là nền tảng lịch sử của hướng này, còn chi tiết YOLOv8 phải đối chiếu với tài liệu Ultralytics, không thể áp nguyên kiến trúc năm 2016 cho phiên bản mới.
+YOLOv8 gồm phần trích xuất đặc trưng, phần dung hợp đa tỉ lệ và đầu dự đoán. Đầu anchor-free giúp mô hình không còn phụ thuộc vào một bộ kích thước anchor cố định. 
+
+Hình 5  Các tầng chức năng của mô hình YOLOv8 trong ứng dụng
+2.6 Hộp bao và độ giao nhau
+Hộp bao trong hệ thống dùng góc trái trên và kích thước (x, y, w, h), còn Ultralytics trả tọa độ hai góc xyxy. Khi chuyển đổi phải đặt w = x2 − x1 và h = y2 − y1, nhầm hai dạng này sẽ làm hộp lệch hoặc phình to. Tọa độ cũng phải đúng với ảnh mà detector nhận vào, sau đó mới ánh xạ về ảnh gốc nếu đã có resize hoặc padding.
+IoU là tỉ lệ giữa diện tích giao và diện tích hợp của hai hộp. Khi đánh giá, IoU quyết định dự đoán nào được ghép với ground truth; khi chạy NMS, IoU cho biết hai dự đoán có phải bản sao của cùng một đối tượng hay không. Hai việc này có thể dùng ngưỡng khác nhau, ngưỡng NMS 0,45 chưa nói gì về tiêu chí đánh giá. Hai hộp khác lớp vẫn có thể chồng lên nhau vì lửa và khói hay xuất hiện trong cùng một vùng ảnh.
+IoU(A,B) = area(A ∩ B) / area(A ∪ B)
+
+Hình 6  Quan hệ giữa hai hộp bao và vùng giao nhau
+2.7 Thước đo ở mức hộp và mức ảnh
+Precision là tỉ lệ dự đoán dương được ghép đúng, Recall là tỉ lệ đối tượng có nhãn được tìm thấy, F1 là trung bình điều hòa của hai đại lượng này. Một ảnh có thể chứa nhiều dự đoán và nhiều ground truth nên đánh giá mức hộp cần quy tắc ghép một đối một. Đánh giá mức ảnh chỉ xét ảnh có ít nhất một vùng mục tiêu hay không. Vì vậy image recall cao vẫn có thể đi cùng box recall thấp, nếu detector nhận đúng ảnh có cháy nhưng định vị kém hoặc bỏ sót đối tượng khác.
+AP tóm tắt đường Precision–Recall khi xét các dự đoán theo thứ tự score. Trong bộ đánh giá của nhóm, mAP là trung bình AP tại IoU 0,3 và 0,5 cho một lớp mục tiêu, khác với mAP50–95 thường thấy trong thư viện YOLO. Khi ghi số liệu phải giữ đúng tên và công thức của evaluator, không đổi tên cột để kết quả trông giống một benchmark khác.
+Precision = TP / (TP + FP)     Recall = TP / (TP + FN)
+F1 = 2 × Precision × Recall / (Precision + Recall)
+2.8 Tính đáp ứng và đồng thời trong ứng dụng desktop
+Ứng dụng nhận diện phải xử lý song song hai việc: vòng lặp sự kiện của giao diện và suy luận hình ảnh. Nếu vòng lặp đọc camera hoặc việc tải mô hình chiếm luồng GUI, cửa sổ sẽ không xử lý được thao tác Dừng. Giao các tác vụ dài cho worker giúp luồng chính giữ được vòng lặp sự kiện. Tuy nhiên, việc chia luồng không làm quá trình suy luận nhanh hơn; ứng dụng vẫn cần quản lý luồng, bộ nhớ và tài nguyên camera để tránh lỗi khi chạy.
+Queue là vùng trao đổi có đồng bộ giữa các luồng. Với hàng đợi khung hình chỉ giữ phần tử mới nhất, GUI không hiển thị mọi frame đã xử lý mà ưu tiên độ trễ thấp. Đây là chủ ý bỏ khung hình ở tầng trình bày, khác với việc làm mất thông báo lỗi. Hệ thống do đó tách hàng đợi frame khỏi hàng đợi sự kiện, và gắn mã phiên để kết quả cũ không cập nhật vào phiên mới.
+CHƯƠNG 3 PHÂN TÍCH VÀ THIẾT KẾ KIẾN TRÚC HỆ THỐNG
+3.1 Yêu cầu chức năng và tiêu chí chấp nhận
+Người dùng phải chọn được nguồn, phương pháp và xem kết quả mà không cần sửa mã. Với nguồn liên tục, Bắt đầu tạo một phiên xử lý, Dừng khóa cảnh báo mới và yêu cầu worker kết thúc, còn Bắt đầu lại phải dùng trạng thái detector mới. Ảnh tĩnh có đường xử lý riêng gồm đọc ảnh, xem trước và nhận diện. Nếu ảnh không hợp lệ, hệ thống phải báo lỗi, không được để cửa sổ mất phản hồi hay âm thầm trả về ảnh trống.
+Các tiêu chí chấp nhận gắn với hành vi quan sát được: ảnh không bị méo, hộp bao đúng hệ tọa độ, thiếu model không bị coi là trạng thái bình thường, không có hai worker cùng đọc một nguồn, và đóng cửa sổ thì capture được giải phóng. Những tiêu chí này đo chất lượng tích hợp. Recall và báo động giả cần tập dữ liệu cùng giao thức đánh giá riêng nên không nằm trong nhóm này.
+Bảng 1  Yêu cầu chức năng và bằng chứng cần có
+Mã
+Yêu cầu
+Tiêu chí kiểm tra
+F01
+Nguồn liên tục
+Mở webcam hoặc video; có frame và FPS
+F02
+Ảnh tĩnh
+Preview và suy luận một lần; không còi
+F03
+Đổi detector
+Traditional YOLO Combined dùng cùng hợp đồng
+F04
+Cảnh báo
+5 frame; cooldown 3 giây; dừng ngắt âm thanh
+F05
+An toàn phiên
+Không nhận frame cũ sau Dừng hoặc đổi nguồn
+F06
+Lỗi rõ ràng
+Ảnh hỏng hoặc model lỗi có thông báo
+F07
+Giải phóng
+Capture release; worker kết thúc trước đóng GUI
+3.2 Kiến trúc module và luồng phụ thuộc
+GUI là tầng điều khiển và trình bày. pipeline.py chứa các hàm dùng chung: chọn detector, kiểm tra hợp đồng, letterbox, ánh xạ tọa độ và vẽ kết quả. Các module traditional và yolo cung cấp thuật toán qua một giao diện thống nhất, còn AlertSystem nhận danh sách detection của nguồn liên tục. GUI không gọi trực tiếp pipeline.run mà có worker riêng và dùng lại các hàm của pipeline. Như vậy hai đường chạy chung phần xử lý ảnh nhưng không có cùng chức năng cảnh báo.
+
+Hình 7  Kiến trúc chức năng và trách nhiệm của bốn thành viên
+3.3 Giao diện detector và hợp đồng dữ liệu
+Đầu vào của detector là mảng BGR đã chuẩn hóa về vùng xử lý 640 × 480, đầu ra là danh sách tuple sáu phần tử (x, y, w, h, label, score). Hàm filter_detections kiểm tra số phần tử, nhãn thuộc fire hoặc smoke, tính hữu hạn của tọa độ và score, miền score từ 0 đến 1, rồi cắt hộp theo biên ảnh. Nhờ vậy lỗi tích hợp bị bắt ngay tại ranh giới module, không chờ đến lúc vẽ mới lộ ra.
+Score nằm trong miền số hợp lệ chưa có nghĩa là có thể so sánh xác suất giữa các detector. Traditional dùng tỉ lệ mặt nạ hoặc tổng trọng số heuristic, YOLO dùng score của mô hình. Hàm load_detector sắp xếp score trong từng backend rồi giữ thứ tự ưu tiên backend khi gộp, nhờ đó một score Traditional cao hơn không tự động được coi là đáng tin hơn dự đoán YOLO trên cùng vùng.
+Bảng 2  Đầu ra detector
+Trường
+Kiểu và ý nghĩa
+Ràng buộc
+x y
+Tọa độ góc trái trên
+Theo ảnh detector nhận trước ánh xạ
+w h
+Kích thước hộp
+Dương; clipping theo biên ảnh
+label
+Chuỗi
+Chỉ fire hoặc smoke
+score
+Số thực
+Hữu hạn trong [0,1]
+frame
+NumPy BGR
+Vùng suy luận 640 × 480
+3.4 Thiết kế các chế độ nhận diện
+Traditional tạo riêng một FireDetector và một SmokeDetector cho mỗi phiên. YOLO tạo detector từ weights đã kiểm tra. Combined lấy lần lượt kết quả của YOLO, lửa truyền thống và khói truyền thống, rồi loại các hộp trùng cùng lớp theo IoU. Hybrid là lớp sử dụng YOLOv8: dùng mặt nạ ứng viên để quyết định có chạy YOLO hay không và xác nhận theo mức chồng lấp. Combined và Hybrid là hai thuật toán khác nhau.
+Thứ tự backend của Combined quy định một chính sách cụ thể: khi hai hộp cùng lớp có IoU vượt ngưỡng thì giữ hộp YOLO đứng trước. Nếu Traditional phát hiện sai ở vùng không trùng thì hộp đó vẫn được giữ, và nếu Traditional gán smoke còn YOLO gán fire thì NMS theo lớp cũng không loại hộp nào. Đây là hạn chế của cách kết hợp theo phép hợp (Union).
+
+Hình 8  Phân biệt Traditional YOLO Combined và Hybrid
+3.5 Hệ tọa độ và nguyên tắc giữ tỷ lệ
+Với ảnh gốc W × H, prepare_frame chọn hệ số s nhỏ hơn trong hai giá trị 640/W và 480/H. Kích thước sau resize được làm tròn và ảnh đặt giữa một nền đen cố định. Hàm trả về sx, sy thực tế sau khi làm tròn cùng độ dịch trái và trên. Để đưa hộp về ảnh gốc, vị trí được trừ padding rồi chia cho sx hoặc sy, kích thước chia tương tự. Lưu hai tỉ lệ thực tế giúp tránh sai số tích lũy với ảnh có kích thước lẻ.
+Trên GUI, hộp được vẽ vào ảnh ở hệ tọa độ gốc rồi cả ảnh mới thu nhỏ bằng ImageOps.contain. Vì ảnh và hộp cùng đi qua một phép thu nhỏ nên vị trí tương đối được giữ nguyên. Với ảnh 1280 × 720, vùng nội dung suy luận là 640 × 360 và padding trên dưới là 60 pixel; ảnh hiển thị cuối cùng vẫn giữ tỉ lệ 16:9. Canvas có kích thước cố định nhưng ảnh không bị kéo về 4:3.
+s = min(640/W, 480/H)     xgốc = (xmodel - left)/sx     ygốc = (ymodel - top)/sy
+
+Hình 9  Letterbox và ánh xạ hộp bao từ ảnh xử lý về ảnh gốc
+3.6 Thiết kế phiên xử lý và quyền sở hữu tài nguyên
+Mỗi lần khởi chạy, GUI tăng mã phiên, tạo Event, các queue và một AlertSystem mới, rồi chuyển các đối tượng này cho worker như một bộ ngữ cảnh cố định. Worker giữ capture riêng và release trong khối finally. Luồng chính không đóng capture khi worker có thể đang read, để tránh thao tác đồng thời không an toàn trên backend camera. Khi worker cũ còn sống thì chưa cho Bắt đầu mới.
+Dừng là cơ chế hủy hợp tác: đặt Event, dừng AlertSystem và tăng mã phiên để kết quả đang xếp hàng mất hiệu lực. Cơ chế này không ép ngắt được một lời gọi native đang kẹt trong driver camera hoặc lúc tải model. Giao diện vẫn xử lý sự kiện, nhưng trạng thái Đang dừng có thể kéo dài đến khi lời gọi đó trả về. Đây là giới hạn của bản triển khai, nhất là khi Camera IP mất kết nối, và cần tính đến lúc đánh giá thời gian dừng.
+
+Hình 10  Vòng đời phiên xử lý và điều kiện chuyển trạng thái
+3.7 Cấu hình tập trung và sự khác nhau giữa tham số
+config.py chứa kích thước xử lý, đường dẫn weights, ngưỡng YOLO, thông số cảnh báo và các giá trị màu chung. Không phải detector nào cũng dùng trực tiếp mọi biến trong file này. FireDetector có PARAMS riêng với s_min = 60 và v_min = 200, khác dải FIRE_HSV_LOWER chung. SmokeDetector lấy một số mặc định từ config nhưng mở rộng saturation và hạ ngưỡng sáng trong PARAMS. Vì vậy phải ghi đúng giá trị thực sự dùng ở từng nhánh.
+IOU_THRESHOLD = 0,45 dùng cho YOLO và là mặc định cho NMS ở pipeline. CONF_THRESHOLD = 0,45 chỉ đi vào YOLODetector, không phải ngưỡng chung loại mọi score Traditional dưới 0,45. LABELS trong config theo thứ tự fire, smoke chỉ là danh sách tên, không phải ánh xạ class ID của dataset. Class ID phải theo data.yaml và model.names, với smoke là 0 và fire là 1.
+Bảng 3  Các cấu hình chung đang dùng
+Biến
+Giá trị
+Phạm vi
+FRAME_WIDTH HEIGHT
+640 và 480
+Vùng xử lý và khung hiển thị
+YOLO_WEIGHTS
+yolo/weights/best.pt
+Weights YOLO
+CONF_THRESHOLD
+0.45
+Chỉ nhánh YOLO
+IOU_THRESHOLD
+0.45
+YOLO và NMS pipeline
+ALERT_N_FRAMES
+5
+Counter cảnh báo
+ALERT_COOLDOWN_SEC
+3
+Khoảng cách lần kích hoạt
+FPS_UPDATE_INTERVAL
+30
+Cửa sổ đo worker
+LOG_FILE
+alerts.log
+Có khai báo chưa có ghi file trong AlertSystem
+3.8 Quản lý lỗi và cấu trúc bàn giao
+Lỗi model, lỗi dữ liệu và không có detection là ba trạng thái khác nhau. GUI đưa ngoại lệ của tầng tích hợp vào hàng đợi sự kiện để hiện lỗi màu đỏ, không biến chúng thành danh sách rỗng. Riêng wrapper detect_smoke ở module truyền thống có khối bắt lỗi bên trong rồi trả về danh sách rỗng; GUI tránh đường này bằng cách gọi trực tiếp phương thức của SmokeDetector. Các script đánh giá có thể vẫn dùng wrapper, nên mức độ nhìn thấy lỗi giữa các đường chạy chưa hoàn toàn giống nhau.
+CHƯƠNG 4 TIỀN XỬ LÝ VÀ PHÁT HIỆN LỬA TRUYỀN THỐNG
+4.1 Phương pháp phát hiện lửa truyền thống và cấu trúc thuật toán
+Phương pháp lửa hiện hành là chuỗi bước có thể giải thích được: tiền xử lý, tạo mặt nạ màu HSV, opening và closing, tìm contour, lọc hình học và chấm điểm vùng.
+Ưu điểm của chuỗi luật là biết được vì sao một vùng được chọn: màu nằm trong dải, diện tích đủ lớn và tỉ lệ hộp hợp lý. Nhược điểm là các điều kiện đó không đặc hiệu cho lửa. Vùng da hay áo cam có thể thỏa mãn dù không cháy, còn ngọn lửa quá nhỏ, quá trắng hoặc thiếu sáng lại có thể bị loại. Vì thế phải xét các bước lọc trong tổng thể, không coi từng ngưỡng là bằng chứng độc lập về bản chất của vật thể.
+
+Hình 11  Các bước phát hiện lửa truyền thống truyền thống
+4.2 Các hàm tiền xử lý và lựa chọn mặc định
+preprocess.py cung cấp resize_frame, normalize, to_hsv, to_gray, gaussian, median, equalize_v, denoise và extract_roi. Hàm normalize trả ảnh float32 trong khoảng gần [0,1], nhưng detector lửa không gọi hàm này trước inRange. Chuẩn hóa cường độ và chuẩn hóa kích thước là hai thao tác khác nhau; chuyển ảnh sang [0,1] mà vẫn giữ ngưỡng uint8 thì mặt nạ sẽ sai.
+Chuỗi preprocess của detector gồm Gaussian, Median rồi CLAHE, mỗi bước tắt khi tham số bằng 0. PARAMS hiện đặt blur = 0, median = 0 và clahe = 0, nghĩa là đường mặc định không dùng ba bộ lọc này. 
+Bảng 4  Các hàm tiền xử lý truyền thống
+Hàm
+Đầu ra
+Điều kiện sử dụng
+resize_frame
+Ảnh đổi kích thước
+Hàm hỗ trợ resize trực tiếp
+normalize
+float32 gần [0,1]
+Không ở đường detect_fire mặc định
+to_hsv to_gray
+Ảnh HSV hoặc xám
+Hàm chuyển màu
+gaussian median
+Ảnh lọc
+Tham số 0 để tắt
+equalize_v
+BGR sau CLAHE trên V
+clip = 0 để tắt
+extract_roi
+Vùng ảnh theo box
+Không đổi hệ tọa độ box
+4.3 Mặt nạ màu lửa và lõi sáng
+Mặt nạ chính truyền thống lấy H từ 0 đến h_max = 35, S từ s_min = 60 trở lên và V từ v_min = 200 trở lên. Dải đỏ ở cuối vòng hue chỉ bật khi h_min_red nhỏ hơn 180; mặc định h_min_red = 180 nên dải này tắt. Các dải màu là kết quả chọn tham số của module, không phải hằng số vật lý dùng được cho mọi camera, vì cân bằng trắng và tự động phơi sáng của webcam có thể làm cùng một vật thể trôi giữa các miền HSV.
+Tùy chọn lõi trắng chọn những pixel rất sáng và có saturation thấp, rồi chỉ giữ phần nằm gần quầng màu cam đã được giãn bằng kernel ellipse. Mục đích là lấy lại phần lõi ngọn lửa bị cháy sáng nên mất saturation. Tuy vậy, vật trắng đặt cạnh vật màu cam cũng thỏa quy tắc này. Khi phân tích ablation phải xem tác động lên cả số vùng phát hiện và tỉ lệ nhiễu, không chỉ nhìn việc ảnh lửa trông đẹp hơn sau khi thêm lõi trắng.
+Mfire = Morange ∪ (Mwhite ∩ dilate(Mhalo,K))
+
+Hình 12  Ảnh đầu vào và các mặt nạ trung gian của detector lửa
+4.4 Hình thái học và lọc hình học
+Detector dùng kernel ellipse 5 × 5 cho cả opening và closing. Opening loại các hạt nhỏ xuất hiện ở vùng phản chiếu, closing nối những vùng ứng viên ở gần nhau. Sau đó findContours với RETR_EXTERNAL chỉ lấy contour ngoài. Cách này giảm phân mảnh nhưng có thể gộp nhiều vùng màu gần nhau thành một hộp lớn, làm định vị kém chính xác dù ảnh vẫn được nhận là có lửa.
+Diện tích contour được giới hạn từ 0,002 đến 0,8 diện tích ảnh. Ở vùng xử lý 640 × 480, cận dưới tương ứng 614,4 pixel; con số này suy ra từ tham số, không phải kích thước thật của vật thể. Tỉ lệ w/h phải nằm trong [0,25; 4,0], nên vùng nhỏ hoặc rất mảnh có thể bị loại dù màu phù hợp. Khi dùng letterbox, phần nền đen vẫn nằm trong tổng diện tích vùng xử lý, vì thế ngưỡng diện tích tương đối có ý nghĩa hơi khác so với cách resize kéo giãn toàn ảnh.
+Bảng 5  Tham số lửa thực tế trong PARAMS
+Nhóm
+Giá trị
+Ý nghĩa
+Màu chính
+H ≤ 35; S ≥ 60; V ≥ 200
+Ngưỡng uint8 OpenCV
+Lõi sáng
+white_v 245; halo_v 100; halo_r 15
+Lõi trắng gần quầng cam
+Morphology
+open 5; close 5
+Kernel ellipse
+Diện tích
+0.002 đến 0.8
+Theo diện tích ảnh xử lý
+Tỉ lệ
+0.25 đến 4.0
+Chiều rộng trên chiều cao
+Score
+min_score 0.0
+Mật độ pixel hợp màu
+Thời gian
+flicker_min 0; warmup 5
+Bộ lọc nhấp nháy mặc định tắt
+4.5 Cách tính điểm vùng lửa
+classify_fire_region tính lại mặt nạ màu trong ROI và chia số pixel trắng cho diện tích ROI. Score càng gần 1 thì phần lớn pixel trong hộp càng thỏa luật màu. Một chiếc áo cam đồng màu có thể được điểm cao hơn vùng lửa có nhiều nền đen, nên score này chưa phải xác suất đã hiệu chuẩn rằng vùng đó đang cháy. Giá trị min_score mặc định bằng 0, tức mọi vùng qua được các bộ lọc trước đều có thể vào kết quả.
+scorefire(B) = countNonZero(color_mask(ROI(B))) / (wB × hB)
+4.6 Đặc trưng nhấp nháy và trạng thái hiện hành
+FireDetector duy trì ba biến prev, act và n. Mặt nạ của hai frame liên tiếp được XOR để tìm pixel đổi trạng thái, rồi chia cho 255 để có độ thay đổi nhị phân. Bản đồ hoạt động act cập nhật bằng trung bình trượt mũ với alpha mặc định 0,3, và hàm flicker lấy trung bình bản đồ này trong hộp bao. Thiết kế đo sự thay đổi của vùng mặt nạ màu, không ước lượng tần số dao động vật lý của ngọn lửa.
+Tham số flicker_min hiện bằng 0, do đó bộ lọc nhấp nháy chưa được bật trong cấu hình mặc định; nhánh này trả kết quả gần với detect_fire.
+Δt = XOR(Mt,Mt-1)/255     At = (1-α)At-1 + αΔt
+4.7 Bằng chứng ablation và cách diễn giải
+Hai file ablation_filter.csv và ablation_pre.csv lưu kết quả khảo sát tiền xử lý và từng bước lọc. Số liệu cho thấy một đánh đổi rõ ràng: nếu chỉ dùng màu thì Recall có thể cao nhưng Precision rất thấp, còn thêm morphology và lọc hình học thì số vùng ứng viên giảm.
+Trong bảng ablation tiền xử lý, Gaussian 5 đạt F1 khoảng 0,2093, nhỉnh hơn mức 0,2065 của cấu hình không tiền xử lý. CLAHE 2,0 tăng Recall nhưng cũng làm tăng FPR ảnh. Kết quả cho thấy lựa chọn bộ lọc cần cân đối giữa phát hiện được nhiều đối tượng và giảm vùng nhận diện nhầm.
+4.8 Nhiễu màu da và đề xuất có thể kiểm chứng
+Màu da thay đổi theo ánh sáng ấm, phản xạ màn hình và cân bằng trắng của camera. Vì vậy, vùng tay hoặc mặt đôi khi rơi vào miền HSV mà detector lửa sử dụng. Hình thái học giúp làm sạch mặt nạ nhưng không thể tự phân biệt da người với lửa; đây là lý do cần kiểm tra thêm các trường hợp nhiễu màu.
+Chỉ tăng s_min hay min_score là chưa đủ vì có thể loại cả lửa thật.
+CHƯƠNG 5 PHÁT HIỆN KHÓI TRUYỀN THỐNG
+5.1 Phương pháp phát hiện khói truyền thống và đặc trưng của khói
+Khói không có biên cứng ổn định, màu có thể trắng, xám hoặc tối, hình dạng thay đổi liên tục và làm mờ kết cấu nền. Mã hiện hành kết hợp màu ít bão hòa, hình thái học, mật độ cạnh và thông tin tiền cảnh MOG2. Đây là tập đặc trưng giải thích được, song không cho biết thành phần hóa học của vùng khí trong ảnh.
+Khói và hơi nước có thể giống nhau về màu và chuyển động, còn mây cũng có cấu trúc mềm và ít bão hòa. Người mặc áo xám đi ngang qua có thể tạo vùng chuyển động trong mặt nạ màu. Do đó khi phân tích lỗi cần xem cả mặt nạ màu, mặt nạ tiền cảnh và điểm từng thành phần. Chỉ nhìn hộp cuối cùng thì chưa biết lỗi do ngưỡng màu quá rộng, mô hình nền chưa ổn định hay phép gán centroid chưa phù hợp.
+
+Hình 13  Chuỗi phát hiện khói và xác thực chuyển động theo vùng
+5.2 Lựa chọn miền màu khói
+SmokeDetector lấy một phần ngưỡng từ config rồi tạo PARAMS riêng. Mặc định s_max được nới ít nhất đến 55, v_min hạ xuống nhiều nhất là 75 và v_max = 235. Miền này giữ được các vùng trắng xám hoặc hơi ngả vàng trong nhiều điều kiện sáng, nhưng tường, trời và quần áo ít bão hòa cũng có thể lọt vào mặt nạ. H gần như phủ cả vòng hue nên saturation và value mới là hai kênh quyết định.
+Detector có nhánh nhận diện khói tối dựa trên độ bão hòa và độ sáng thấp, nhưng cấu hình hiện tại đặt enable_black_smoke = False. 
+Bảng 6  Các nhóm tham số khói đang dùng
+Nhóm
+Giá trị
+Ý nghĩa
+HSV
+S tối đa 55; V 75 đến 235
+Lấy từ cấu hình và điều chỉnh PARAMS
+Khói đen
+enable_black_smoke False
+Chưa bật mặc định
+Morphology
+open 5; close 11 hai lần
+Làm sạch và nối vùng
+Diện tích
+600 đến 250000
+Pixel contour trên ảnh xử lý
+MOG2
+history 500; var 40; lr 0.003
+Mô hình nền từng phiên
+Chuyển động
+min_motion_ratio 0.015
+Tỉ lệ tiền cảnh trong contour
+Cạnh
+Canny 40 120; density ≤ 0.22
+Loại vùng nhiều cạnh
+Centroid
+Dung sai 45 pixel
+Tạo thưởng bốc lên
+Score
+min_score 0.15
+Tổng heuristic có chặn
+5.3 MOG2 và xác thực chuyển động trong contour
+Mô hình nền được tạo với history = 500, varThreshold = 40 và detectShadows = False. Ở mỗi frame video, apply được gọi với learningRate mặc định 0,003 và đầu ra được nhị phân hóa tại mức 150 để thành vùng chuyển động. Hệ thống không lấy giao trực tiếp giữa toàn bộ mặt nạ màu và mặt nạ chuyển động để tạo contour, vì cách đó có thể băm một đám khói thành nhiều mảnh nhỏ.
+Thay vào đó, contour lấy từ mặt nạ màu đã làm sạch, và với từng contour detector đo tỉ lệ pixel tiền cảnh bên trong. Contour có motion_ratio nhỏ hơn 0,015 bị loại. Cách này giữ hình khối ứng viên theo màu và dùng chuyển động như bằng chứng bổ sung. Nó vẫn có thể giữ lại một vật xám đang di chuyển, và frame đầu của MOG2 thường chưa có nền đủ ổn định, nên trạng thái nền phải được khởi tạo riêng mỗi khi đổi nguồn.
+
+Hình 14  Minh họa kiểm tra chuyển động trong contour khói
+motion_ratio(C) = moving_pixels(C) / (area(C) + ε)
+5.4 Hình thái học và kiểm tra kích thước
+Mặt nạ màu được opening với kernel ellipse 5 × 5, sau đó closing với kernel 11 × 11, lặp hai lần. Kernel lớn hơn ở nhánh lửa giúp nối khối khói bị phân tán, đổi lại dễ gộp nhầm nền trời hoặc vùng sáng. Sau findContours, diện tích ứng viên được giới hạn từ 600 đến 250000 pixel. Đây là ngưỡng tuyệt đối đặt cho vùng xử lý chuẩn và không tự thích nghi theo kích thước thật của vật thể.
+Detector tính aspect = max(w,h)/min(w,h) và cả tỉ lệ w/h. Contour bị loại khi aspect vượt 5 hoặc w/h thấp hơn 0,2. Cần đọc đúng biểu thức trong mã, không nên chỉ dựa vào tên tham số max_ratio. Sau khi hệ thống chuyển sang letterbox, các tham số vẫn chạy trên vùng 640 × 480; với ảnh rất rộng hoặc rất cao, phần nội dung hữu ích có thể nhỏ hơn vùng xử lý đầy đủ nên cần kiểm tra lại với khói kích thước nhỏ.
+5.5 Mật độ cạnh và xu hướng bốc lên
+compute_contour_edge_density cắt ROI xám, vẽ mặt nạ contour cục bộ rồi đếm pixel Canny nằm trong contour. Tỉ lệ cạnh cao gợi ý vùng nhiều cấu trúc sắc như đồ vật rắn, nên detector loại khi edge_dens > 0,22. Phép đo này dùng cạnh hiện có của ROI, không đo trực tiếp mức suy giảm gradient so với ảnh nền tham chiếu. Như vậy, ý niệm “khói làm mờ nền” chỉ là động cơ lý thuyết, còn thứ thực sự được cài đặt là bộ lọc mật độ cạnh.
+Hàm _is_rising_or_spreading tìm centroid ở frame trước có khoảng cách Manhattan nhỏ nhất, rồi kiểm tra centroid mới không thấp hơn quá dung sai 45 pixel. Hàm không gán một đối một, không có track ID và không đo rõ tốc độ mở rộng của vùng. Khi có nhiều vật thể, centroid gần nhất có thể thuộc đối tượng khác. Ngoài ra is_rising chỉ cộng điểm thưởng, không phải điều kiện loại bắt buộc, nên vùng đi xuống vẫn có thể được giữ nếu tổng điểm đủ cao.
+edge_density(C) = edge_pixels_inside(C) / mask_pixels(C)
+5.6 Tổng hợp điểm heuristic của khói
+Điểm khói là tổng của bốn thành phần đều có chặn trên: diện tích, độ mềm cạnh, chuyển động và phần thưởng bốc lên. area_score tối đa 0,35, edge_score tối đa 0,35, motion_score tối đa 0,20 và rising_bonus bằng 0,10 khi thỏa điều kiện. Tổng được cắt về [0,1] và làm tròn bốn chữ số. min_score = 0,15 là ngưỡng riêng của module, không liên quan đến CONF_THRESHOLD của YOLO.
+Một vùng xám rộng, ít cạnh vẫn có thể được điểm lớn dù không phải khói. Các thành phần có quan hệ với nhau nên tổng điểm không phải xác suất độc lập.
+Ssmoke = min(8A/WH,0.35) + 0.35 max(0,1-E/0.22) + Smotion + Srising
+5.7 Chế độ ảnh tĩnh và quản lý trạng thái
+Một ảnh tĩnh không có chuyển động theo thời gian. Vì vậy khi image_mode = True, tạo SmokeDetector(params={use_bg_sub: False}), tận dụng tùy chọn có sẵn của module. Các thành phần màu, hình thái học, cạnh và diện tích vẫn chạy bình thường, nhưng kết quả đó không thể dùng để mô tả chuyển động bốc khói vì không có chuyển động nào được quan sát.
+Khi tắt trừ nền, motion_score được đặt 0,20 theo mã và is_rising mặc định True nên có thể cộng thêm 0,10 điểm. Do đó score của ảnh tĩnh và của video mang ý nghĩa vận hành khác nhau, kể cả khi ROI giống nhau. Cần ghi image_mode trong log thực nghiệm và không gộp hai chế độ khi so sánh score. Mỗi phiên dùng detector mới nên nền và centroid của video cũ không ảnh hưởng đến ảnh mới hay webcam mới.
+Nền MOG2 có thể dần học một vùng khói đứng lâu thành nền; learningRate thấp làm chậm quá trình thích nghi.
+CHƯƠNG 6 PHÁT HIỆN LỬA VÀ KHÓI BẰNG YOLOV8
+6.1 Phương pháp phát hiện bằng YOLOv8 và chuỗi học sâu
+Quy trình học sâu gồm chuẩn bị ảnh và nhãn, chia train, validation, test, chọn model nền, huấn luyện, chọn weights tốt nhất và chạy suy luận. Ứng dụng thuộc hệ thống tích hợp chỉ dùng weights cuối thông qua wrapper và không huấn luyện khi bấm Bắt đầu. Hai giai đoạn này tách bạch: nạp best.pt khác với việc tiếp tục học trên webcam.
+File best.pt hiện có dung lượng 6.487.139 byte và khi kiểm tra trong môi trường fire-smoke đã nạp được model.names = {0: smoke, 1: fire}.
+6.2 Dữ liệu D Fire và cấu trúc nhãn
+data.yaml nằm ở gốc repository với path là ./data cùng các thư mục train/images, val/images và test/images. Hai lớp được khai báo theo thứ tự smoke rồi fire. Nhãn YOLO gồm class_id và bốn tọa độ chuẩn hóa: tâm x, tâm y, chiều rộng và chiều cao. Khi đổi nhãn sang pixel phải dùng đúng kích thước ảnh hoặc kích thước mà evaluator sử dụng, không được coi tọa độ chuẩn hóa là pixel [9].
+Ảnh có file nhãn rỗng là mẫu âm tính theo quy ước của dữ liệu, không phải file bị hỏng. Mẫu âm tính có ích khi đánh giá báo động giả, nhưng nhãn rỗng chỉ cho biết dataset không gán đối tượng nào, nên vẫn phải kiểm tra chất lượng gán nhãn. Khi chia dữ liệu cần tránh để các frame sát nhau của cùng một video rơi vào cả train và test. Nếu nhóm bổ sung dữ liệu ngoài bản chia sẵn thì phải lưu danh sách chia tập và nguồn ảnh.
+
+Hình 15  Ảnh và bounding box từ nhãn gốc của dataset
+Bảng 7  Thống kê dữ liệu local theo file nhãn
+Tập
+Ảnh
+Rỗng
+Chỉ khói
+Chỉ lửa
+Cả hai
+train
+14122
+6458
+3836
+770
+3058
+val
+3099
+1375
+845
+174
+705
+test
+4306
+2005
+1186
+220
+895
+x1 = (xc-wn/2)W     y1 = (yc-hn/2)H     w = wnW     h = hnH
+6.3 Huấn luyện và các siêu tham số trong mã
+Hàm train_yolo gọi YOLO(model_name) rồi model.train với dữ liệu, epochs, batch, imgsz, device, learning rate và các tham số tăng cường màu. Mặc định là 50 epochs, batch 16, imgsz 640 và lr0 0,01. Script có ba preset để khảo sát mô hình n, mô hình s và cấu hình tăng cường dữ liệu.
+
+Hình 16  Quy trình huấn luyện và suy luận trong mã nguồn
+get_default_device chọn GPU số 0 nếu CUDA có sẵn, nếu không thì dùng CPU, nên không thể suy ra mọi máy đều có GPU từ trường device của train_yolo hay tùy chọn CLI.
+Bảng 8  Ba preset huấn luyện có trong train.py
+Preset
+Model nền
+Batch
+lr0
+Thiết lập đáng chú ý
+1 Baseline
+yolov8n.pt
+16
+0.01
+imgsz 640; mặc định 50 epoch
+2 Deeper
+yolov8s.pt
+8
+0.01
+So sánh kiến trúc lớn hơn
+3 Augmented
+yolov8n.pt
+16
+0.005
+hsv_s 0.8; hsv_v 0.5; mosaic 1.0
+6.4 Tăng cường dữ liệu và rủi ro thay đổi phân phối
+Các tham số hsv_h, hsv_s, hsv_v thay đổi thuộc tính màu khi huấn luyện, còn mosaic ghép nhiều ảnh vào một mẫu. Mục đích là tăng độ đa dạng để mô hình ít phụ thuộc vào một bối cảnh cố định. Nếu tăng cường quá mạnh, ảnh có thể ít giống webcam thực tế hoặc làm vùng lửa nhỏ khó nhìn thấy. Vì vậy phải chọn preset trên validation, không dùng test để tìm preset cho số đẹp nhất.
+So với baseline, preset 3 giảm lr0 xuống 0,005 và tăng hsv_s lên 0,8, hsv_v lên 0,5.
+6.5 Nạp model và xác thực nhãn trong tích hợp
+Wrapper sử dụng YOLOv8 có nhánh fallback sang yolov8n.pt khi đường dẫn weights không tồn tại. Bản tích hợp thuộc hệ thống tích hợp kiểm tra file tồn tại, kích thước khác 0 và nạp bằng đường dẫn tuyệt đối trước khi cho dùng. Sau khi nạp, _load_checked_yolo kiểm tra model.names chỉ gồm hai nhãn fire và smoke. Nhờ vậy đường GUI và pipeline không thể âm thầm dùng nhầm một mô hình COCO với các nhãn người hay xe.
+Không phải script độc lập nào cũng đi qua bộ chặn này. eval/compare_models.py gọi hàm detect ở module yolo, nên khi chạy evaluator vẫn phải bảo đảm weights có mặt. Khi file tồn tại nhưng hỏng, ngoại lệ từ thư viện được đưa lên giao diện, không biến thành danh sách detection rỗng rồi báo bình thường.
+pipeline.py  hàm _load_checked_yolo  dòng 88 đến 104
+
+6.6 Suy luận và chuyển đổi kết quả
+YOLODetector.detect nhận ảnh BGR với conf và iou lấy từ cấu hình, còn device mặc định None để thư viện tự chọn. r.boxes.xyxy, conf và cls được chuyển về CPU và NumPy, sau đó đổi hai góc thành x, y, w, h. Wrapper ưu tiên nhãn trong model.names để đặt fire hoặc smoke, và pipeline kiểm tra lại hợp đồng để nhãn ngoài tập không vào được AlertSystem. Ảnh chỉ đổi sang RGB sau đoạn suy luận để hiển thị [7].
+Ngưỡng conf = 0,45 là một phần của cấu hình hiện hành. Ultralytics còn có các bước resize và letterbox nội bộ tùy backend.
+6.7 Phương pháp Hybrid và khác biệt so với Combined
+HybridDetector tạo ứng viên bằng mặt nạ HSV của lửa hoặc khói, opening 5 × 5 và lọc contour có diện tích tối thiểu 150 pixel. Nếu không có ứng viên thì bỏ qua YOLO; nếu có thì YOLO chạy trên toàn frame và kết quả được giữ khi diện tích giao với một ứng viên chiếm ít nhất 15% diện tích hộp YOLO. Đây là tỉ lệ phủ trên hộp YOLO, không phải IoU giữa hai hộp.
+Thuộc tính verify_iou_thresh mặc định 0,20 được lưu trong đối tượng, nhưng điều kiện kiểm tra hiện dùng hằng 0,15 theo diện tích hộp. Docstring nhắc đến MOG2 và NMS, trong khi _extract_candidates chỉ dùng màu và morphology, không có MOG2, và phần detect cũng không cài NMS riêng. Hộp được giữ sẽ có score nhân hệ số 1,05 rồi chặn tại 1.
+
+Hình 17  Cơ chế bỏ qua YOLO và xác nhận vùng trong Hybrid hiện tại
+6.8 Tổng hợp thực nghiệm và kết quả YOLOv8
+Mô hình YOLOv8 được triển khai thông qua Ultralytics và sử dụng file best.pt cho hai lớp smoke và fire. Các kết quả so sánh được nhóm tập hợp trong comparison_summary.json, gồm bốn phương pháp với 100 ảnh cho mỗi phương pháp. Bảng chỉ số và cách diễn giải được trình bày ở Chương 8.
+Nhánh YOLOv8 chịu trách nhiệm suy luận từ ảnh đầu vào, chuyển kết quả về định dạng hộp bao chung và cung cấp dữ liệu để so sánh với các thuật toán truyền thống.
+CHƯƠNG 7 XÂY DỰNG PIPELINE GUI VÀ HỆ THỐNG CẢNH BÁO
+7.1 Phạm vi xây dựng và tích hợp hệ thống
+Bản cập nhật hiện tại bổ sung chế độ Image, xác thực model, kiểm tra kết quả, NMS theo lớp, quản lý worker và cảnh báo âm thanh.
+Mục tiêu của tầng này là biến các hàm nhận diện rời rạc thành một ứng dụng có vòng đời rõ ràng. Nạp model hay đọc webcam thất bại thì phải báo cho người dùng; bấm Dừng rồi thì detection đến muộn không được bật còi; chọn ảnh mới thì không được nhận nhầm khung hình cũ. Đây là những yêu cầu của kỹ thuật phần mềm hệ thống, không liên quan đến độ chính xác của detector: một GUI chạy đúng vẫn có thể hiển thị dự đoán sai do thuật toán đưa vào.
+7.2 Quy trình xử lý nguồn liên tục
+Worker mở VideoCapture bằng nguồn đã lấy từ giao diện, kiểm tra isOpened rồi nạp detector. Với mỗi frame đọc được, detect_frame thực hiện letterbox và suy luận, kết quả được ánh xạ về ảnh gốc, vẽ hộp, chuyển cho AlertSystem và tính FPS. Sau đó worker đổi BGR sang RGB, tạo ảnh Pillow và đưa phần tử mới nhất vào queue. Mọi thao tác với PhotoImage và widget chỉ nằm trong hàm poll của luồng chính.
+Luồng xử lý có các điểm kiểm tra stop_event trước hoặc sau những tác vụ dài để hủy hợp tác. Nếu người dùng đã bấm Dừng sau khi đọc nguồn hoặc sau suy luận, worker không đưa kết quả đó vào cảnh báo nữa. Ngoại lệ mà module con chưa che giấu được chuyển thành sự kiện lỗi, còn khối finally dừng alerts và release capture. Khi nguồn đã mở nhưng không đọc được frame đầu, GUI báo riêng chứ không coi là video đã kết thúc bình thường.
+
+Hình 18  Luồng xử lý webcam video và Camera IP trong GUI
+7.3 Chế độ Image và xử lý đường dẫn tiếng Việt
+Nhánh Image có hai tác vụ: preview chỉ đọc và hiển thị ảnh, còn image đọc ảnh rồi gọi detector một lần. read_image kiểm tra phần mở rộng JPG, JPEG, PNG, BMP, đọc bytes bằng NumPy và giải mã bằng OpenCV. Cách này xử lý đường dẫn Windows có ký tự Unicode tốt hơn cách đọc ảnh đơn giản ở một số phiên bản OpenCV. File có đuôi .png nhưng nội dung không giải mã được vẫn bị từ chối với thông báo rõ ràng.
+Việc đọc và suy luận ảnh đều nằm ở worker nên mainloop không bị khóa khi nạp YOLO. Khi người dùng chọn ảnh khác, GUI hủy phiên cũ và có thể xếp yêu cầu preview kế tiếp sau khi worker cũ kết thúc. Nhánh ảnh kết thúc bằng return trước đoạn xử lý nguồn liên tục nên không có lời gọi alerts.update. AlertSystem vẫn được tạo cho ngữ cảnh chung nhưng còi không chạy, vì âm thanh chỉ được yêu cầu từ update khi đủ điều kiện.
+
+Hình 19  Đường đi riêng của xem trước và nhận diện ảnh tĩnh
+7.4 Bố cục giao diện và phản hồi người dùng
+Cửa sổ có kích thước cố định 900 × 700. Hàng trên cùng chọn loại nguồn, nhập đường dẫn và có các nút chọn video hoặc ảnh; hàng kế tiếp là radio chọn detector; hàng điều khiển gồm Bắt đầu, Dừng, Nhận diện ảnh và FPS. Phần hình ảnh là một Label trong Frame cố định 640 × 480, không tạo lại canvas item liên tục. Thanh trạng thái ở cuối dùng wraplength để thông báo dài không tràn ngang.
+Ảnh hiển thị được thu nhỏ bằng ImageOps.contain, và đối tượng PhotoImage được giữ tham chiếu qua self._photo để không bị thu gom khi widget còn dùng. Mỗi lần cập nhật chỉ đổi thuộc tính image của Label.
+7.5 Queue luồng chính và worker
+_frames là Queue(maxsize=1). Khi có frame mới, _publish bỏ phần tử đang chờ rồi đưa phần tử mới vào. Chính sách này ưu tiên thông tin gần thời điểm hiện tại và tránh hàng đợi ảnh phình ra khi GUI cập nhật chậm hơn worker. _events là queue riêng cho trạng thái kết thúc và lỗi. Các đối tượng này được truyền thẳng vào worker, vì vậy worker không thể ghi nhầm vào một queue mới vừa gán cho phiên khác.
+_poll_frames được lập lịch trên main thread mỗi 15 ms. Hàm lấy frame, kiểm tra mã phiên rồi tạo PhotoImage và cập nhật Label, FPS và trạng thái. Chu kỳ 15 ms không bảo đảm cửa sổ đạt 66,7 FPS vì tốc độ thực còn phụ thuộc detector, hệ điều hành và việc render ảnh. Trước khi đủ 30 frame, FPS có thể là 0 hoặc chưa có giá trị dùng được. Vì vậy phải ghi rõ đại lượng đo, không suy ra từ chu kỳ after.
+
+Hình 20  Trao đổi dữ liệu giữa worker và main thread
+7.6 Dừng khởi động lại và chuyển nguồn
+Hàm stop đặt _running = False, tăng _session, đặt Event và dừng AlertSystem. Mã phiên tăng khiến ảnh hoặc sự kiện của worker cũ đã xếp hàng không còn được chấp nhận. _launch chỉ tạo worker khi luồng trước đã kết thúc; khi nhận ra worker dừng, GUI cập nhật nút và có thể chạy preview đang chờ. Cách làm này ưu tiên an toàn của phiên hơn việc mở ngay một capture mới khi capture cũ vẫn đang đọc.
+Khi đóng cửa sổ, chương trình đặt _closing rồi gọi stop, sau đó poll chờ worker kết thúc trước khi root.destroy. Chương trình không join một luồng dài ngay trong callback GUI nên mainloop vẫn phản hồi. Tuy nhiên nếu thư viện native không trả về thì không có mức thời gian dừng tối đa nào được bảo đảm, và đóng ứng dụng không phải lúc nào cũng tức thời.
+gui/app.py  hàm stop  dòng 278 đến 289
+
+Hủy phiên và khóa cảnh báo khi nhấn Dừng
+7.7 Quy tắc năm khung hình liên tiếp
+AlertSystem dùng một counter đếm số frame có danh sách detection không rỗng. Khi không có detection, counter về 0 và is_alerting về False. Khi có detection và counter đạt ALERT_N_FRAMES = 5, hệ thống kiểm tra cooldown trước khi bật cảnh báo và yêu cầu phát âm thanh. Fire và smoke cùng góp vào một điều kiện, không có bộ đếm riêng cho từng lớp hay từng hộp.
+Vì chỉ kiểm tra danh sách có rỗng hay không, năm frame liên tiếp có thể lần lượt nhận lửa ở tay, khói ở mặt rồi một vùng khác mà vẫn tạo thành một chuỗi dương. Năm frame cũng không ứng với một khoảng thời gian cố định: nếu tốc độ xử lý trung bình là f frame/giây thì từ frame dương đầu đến frame thứ năm mất khoảng 4/f giây khi tốc độ đều, còn thời gian tính từ lúc sự kiện thật xảy ra phụ thuộc thêm pha lấy mẫu và độ trễ xử lý. Công thức này chỉ là phân tích lý thuyết, không phải kết quả đo thời gian báo động thực tế.
+ct = 0 nếu Dt rỗng     ct = ct-1 + 1 nếu Dt không rỗng
+Bảng 9  Ví dụ logic chuỗi năm frame không phải số đo thực nghiệm
+Frame
+Có detection
+Counter
+Kết quả khi cooldown cho phép
+1
+Có
+1
+Chưa cảnh báo
+2
+Có
+2
+Chưa cảnh báo
+3
+Không
+0
+Reset
+4 đến 7
+Có liên tiếp
+1 đến 4
+Chưa đạt ngưỡng
+8
+Có
+5
+Kích hoạt
+9
+Có
+6
+Giữ trạng thái; chưa phát lại trong cooldown
+10
+Không
+0
+Xóa trạng thái nhưng giữ mốc thời gian
+7.8 Cooldown và trạng thái cảnh báo
+Cooldown = 3 giây giới hạn khoảng cách giữa hai lần kích hoạt đủ điều kiện, tính bằng time.monotonic để không bị ảnh hưởng khi chỉnh giờ hệ thống. last_alert_time ban đầu là None nên lần đầu đủ năm frame không bị chặn bởi mốc 0 của đồng hồ. Khi cảnh báo đang bật và detection vẫn xuất hiện, update vẫn trả True kể cả trong thời gian cooldown; cooldown chỉ ngăn phát lại âm thanh, không buộc tắt chữ cảnh báo đỏ sau mỗi frame.
+Khi một frame không có detection, chữ cảnh báo bị xóa nhưng last_alert_time không được đặt lại. Do đó một đợt dương mới đạt năm frame trong vòng ba giây sau lần trước vẫn phải chờ hết phần thời gian còn lại. Mặt khác, last_alert_time được cập nhật trước lời gọi âm thanh, nên nếu SND_NOSTOP từ chối phát vì kênh đang bận thì mốc cooldown vẫn đã dịch chuyển. Đây là hành vi thực tế của mã.
+7.9 Âm thanh bất đồng bộ và khóa đồng bộ
+Âm thanh được phát bằng winsound.PlaySound với SND_ASYNC và SND_NOSTOP. SND_ASYNC trả về ngay sau khi gửi yêu cầu phát, còn SND_NOSTOP không cắt âm thanh đang phát để nhường chỗ cho yêu cầu mới, nên không cần tạo thêm một luồng Python chỉ để chờ file WAV kết thúc. RLock cấp module bao quanh phần cập nhật và dừng để tránh cuộc đua: stop vừa xong thì một update cũ mới gửi yêu cầu phát [8].
+_AUDIO_OWNER ghi instance sở hữu lần phát thành công gần nhất. stop chỉ gọi PlaySound(None,0) khi instance đó đang giữ kênh, rồi bỏ quyền sở hữu, nên một instance cũ không thể tự ngắt âm thanh của instance mới. Đồng thời _active = False làm update sau stop luôn trả False. Khi Bắt đầu lại, GUI tạo AlertSystem mới, còn việc đặt lại _active cho đối tượng cũ không được dùng đến.
+
+Hình 21  Điều kiện kích hoạt và dừng âm thanh cảnh báo
+7.10 Tài nguyên WAV và phương án dự phòng
+Đọc header WAV thực tế cho thấy file là mono, PCM 16 bit, tần số lấy mẫu 44.100 Hz, thời lượng khoảng 1,34993 giây. Nếu file không tồn tại, mã gọi alias SystemExclamation ở chế độ bất đồng bộ. Nếu không có winsound, hệ thống in thông báo bỏ qua âm thanh; hiện chưa có backend đa nền tảng nào khác.
+7.11 FPS hiệu năng và quản lý bộ nhớ
+FPS trong worker được cập nhật mỗi FPS_UPDATE_INTERVAL = 30 frame, bằng số frame chia cho khoảng thời gian monotonic.
+CHƯƠNG 8 THỰC NGHIỆM ĐÁNH GIÁ VÀ SO SÁNH PHƯƠNG PHÁP
+8.1 Thiết kế bằng chứng và phiên bản khảo sát
+Bảng 10  Phân loại nguồn bằng chứng sử dụng trong báo cáo
+Loại
+Nguồn
+Giới hạn
+Mã nguồn
+Commit 40ea155
+Xác định cài đặt không chứng minh độ chính xác
+Kết quả lưu sẵn
+JSON và CSV trong repo
+Thiếu manifest và metadata đầy đủ
+Dữ liệu thật
+Ảnh test và best.pt local
+Một vài mẫu không đại diện toàn tập
+Phản ánh vận hành
+Tay mặt bị nhận nhầm
+Chưa có frame đồng bộ và nguồn từng box
+8.2 Môi trường phần mềm và dữ liệu quan sát
+Dataset local gồm 14.122 ảnh train, 3.099 ảnh validation và 4.306 ảnh test, tổng cộng 21.527 ảnh. Số file nhãn ở từng tập bằng đúng số ảnh. Khi đọc class ID, nhóm ghi nhận được cả ảnh chỉ có khói, chỉ có lửa, có cả hai và ảnh nhãn rỗng. Kiểm tra này chưa thay được việc rà soát nội dung ảnh hay kiểm định mọi tọa độ hộp bao, vì nhãn sai vị trí vẫn có thể tồn tại dù class ID hợp lệ.
+8.3 Giao thức đánh giá mức hộp
+Evaluator sắp các dự đoán theo score giảm dần và ghép tham lam với những ground truth chưa dùng, chọn hộp có IoU lớn nhất. Dự đoán là TP khi ghép được với IoU đạt ngưỡng, các hộp còn lại là FP và ground truth chưa được ghép là FN. Cơ chế này không cho nhiều hộp cùng tính công cho một đối tượng. Ngưỡng IoU mặc định để tính Precision, Recall và F1 trong script là 0,3, nhưng file JSON không ghi trực tiếp tham số đã dùng ở lần chạy lưu sẵn.
+compute_ap nội suy precision theo hướng bao trên rồi cộng diện tích mỗi khi recall thay đổi, còn compute_map tính AP tại 0,3 và 0,5 rồi lấy trung bình. Mỗi lượt evaluator chỉ lọc theo một lớp mục tiêu, nên “mAP” trong file không phải trung bình của hai lớp smoke và fire, cũng không phải mAP50–95. Báo cáo giữ nguyên tên cột gốc và giải thích quy ước để người đọc không đem so trực tiếp với metric của model.val trong Ultralytics.
+mAPrepo = (AP@0.3 + AP@0.5) / 2
+8.4 Đánh giá mức ảnh và báo động giả
+Ở mức ảnh, has_gt là ảnh có ít nhất một ground truth của lớp mục tiêu, has_pred là ảnh có ít nhất một dự đoán của lớp đó. img_fpr lấy mẫu số là toàn bộ ảnh âm theo lớp mục tiêu; chẳng hạn khi đánh giá fire, ảnh chỉ có smoke vẫn tính là ảnh không có fire. none_fpr chỉ xét ảnh có file nhãn không chứa đối tượng nào. Hai mẫu số khác nhau nên không thể gộp thành một “tỷ lệ báo cháy sai” chung.
+Đánh giá mức ảnh không yêu cầu hộp đúng vị trí: chỉ cần có ít nhất một dự đoán và một nhãn mục tiêu là tính được image TP. Tần suất còi kêu sai khi chạy webcam lại phụ thuộc vào chuỗi frame và cooldown. Muốn đánh giá hệ thống cảnh báo phải có thêm số đợt báo sai trên thời gian giám sát, độ trễ phát hiện và số sự kiện bị bỏ sót. Báo cáo chưa có các phép đo theo sự kiện này và không suy chúng từ img_fpr của ảnh độc lập.
+FPRảnh = FPảnh / (FPảnh + TNảnh)     FPRnone = số ảnh nhãn rỗng bị báo / tổng ảnh nhãn rỗng
+8.5 Kết quả so sánh đang lưu trong repository
+comparison_summary.json chứa 100 ảnh cho mỗi phương pháp: lửa truyền thống truyền thống, khói truyền thống truyền thống, YOLOv8 lửa và Phương pháp Hybrid. Bảng dưới chép các giá trị trong file, có làm tròn để dễ đọc. Không có hàng Combined vì file không chứa kết quả của chế độ này. Phương pháp khói có lớp mục tiêu khác với ba hàng còn lại, nên xếp hạng tuyệt đối theo một cột F1 chung cho cả bốn hàng là chưa chặt chẽ [10].
+Bảng 11  Kết quả lưu sẵn với 100 ảnh mỗi phương pháp
+Phương pháp
+P box
+R box
+F1 box
+FPR ảnh
+FPS
+Lửa
+0.2763
+0.3000
+0.2877
+0.2250
+159.8
+Khói
+0.0441
+0.0625
+0.0517
+0.2632
+94.3
+YOLOv8 Lửa
+0.8718
+0.4857
+0.6239
+0.0000
+116.6
+Hybrid
+0.8750
+0.3000
+0.4468
+0.0000
+98.7
+
+Hình 22  Các giá trị Precision Recall và F1 trong comparison_summary.json
+YOLOv8 lửa trong bảng có box precision khoảng 0,8718 và recall khoảng 0,4857, tức là các dự đoán khá chính xác nhưng vẫn bỏ sót đáng kể ground truth. Hybrid có precision khoảng 0,8750 và recall 0,3000, cho thấy yêu cầu ứng viên màu có thể loại luôn cả những dự đoán đúng. Đây là nhận xét trên bảng lưu sẵn, chưa phải ước lượng cho webcam hiện tại hay cho một lần train khác.
+FPS trong bảng được đo ở tầng detector sau năm ảnh warmup, chưa bao gồm toàn bộ thời gian đọc ảnh, dựng GUI và phát cảnh báo. Trong khi đó GUI dùng letterbox, còn script benchmark resize về 640 × 480. Vì điều kiện xử lý khác nhau, số FPS này nên được hiểu là tốc độ detector trong phép đo đã lưu, không phải FPS cam kết trên mọi máy.
+8.6 Ablation tiền xử lý truyền thống
+ablation_pre.csv cho phép so sánh bảy cấu hình trên cùng khung evaluator. Bảng sau giữ nguyên số liệu đã lưu và không trộn với bảng 100 ảnh.
+Bảng 12  Ablation tiền xử lý đang lưu
+Cấu hình
+P box
+R box
+F1
+FPR ảnh
+FPS
+Không tiền xử lý
+0.2180
+0.1962
+0.2065
+0.1757
+149.3
+Gaussian 3
+0.2193
+0.1981
+0.2082
+0.1766
+128.0
+Gaussian 5
+0.2213
+0.1985
+0.2093
+0.1757
+126.5
+Median 5
+0.2130
+0.2008
+0.2067
+0.1860
+113.4
+Gaussian 3 + Median 5
+0.2185
+0.2008
+0.2093
+0.1779
+101.2
+CLAHE 2.0
+0.1856
+0.2362
+0.2078
+0.2320
+105.9
+Gaussian 3 + Median 5 + CLAHE
+0.1553
+0.2426
+0.1894
+0.3149
+90.6
+Gaussian 5 nhỉnh hơn bản không tiền xử lý về F1 trong bảng, nhưng chênh chỉ khoảng 0,0028 điểm tuyệt đối. CLAHE tăng Recall lên khoảng 0,2362, đồng thời FPR ảnh tăng lên khoảng 0,2320. Chuỗi nhiều bộ lọc có Recall khoảng 0,2426 nhưng Precision và FPS đều thấp hơn bản không xử lý. Các kết quả này minh họa sự đánh đổi giữa việc tìm thêm ứng viên và việc tăng nhiễu.
+8.7 Ablation các bước lọc lửa
+Trong ablation_filter.csv, mặt nạ màu đơn lẻ có F1 khoảng 0,0069, còn cấu hình gồm morphology, lọc diện tích và tỉ lệ đạt F1 khoảng 0,2065. Precision tăng mạnh trong khi Recall giảm so với một số bước ít lọc hơn. Kết quả này phù hợp với vai trò của bộ lọc hình học là loại nhiều ứng viên.
+Bảng 13  Ablation các bước lọc lửa đang lưu
+Bước
+Precision
+Recall
+F1
+FPR ảnh
+Chỉ mặt nạ màu (có lõi trắng)
+0.0035
+0.3920
+0.0069
+0.8230
++ close 5x5
+0.0065
+0.4113
+0.0128
+0.8230
++ open 5x5
+0.0438
+0.3015
+0.0764
+0.4387
++ lọc diện tích tối thiểu
+0.1991
+0.2013
+0.2002
+0.2171
++ lọc diện tích tối đa
+0.1991
+0.2013
+0.2002
+0.2171
++ lọc tỉ lệ rộng/cao (hiện tại)
+0.2180
+0.1962
+0.2065
+0.1757
+Hiện tại, bỏ lõi trắng
+0.1846
+0.1521
+0.1668
+0.1586
+Hai file JSON val_tuned và val_whitecore đều ghi n_images = 3099 nhưng FPS chênh nhau rất nhiều.
+8.8 Kiểm tra ảnh thật trong ba chế độ
+Ba mẫu AoF07738, AoF06978 và AoF06723 thuộc tập test, dùng để kiểm tra đường tích hợp và minh họa lỗi. Nhãn của chúng lần lượt là chỉ có fire, chỉ có smoke và rỗng. Theo lần chạy đã ghi, Traditional không tìm thấy fire ở mẫu fire nhưng có một vùng smoke; YOLO tìm được một fire và thêm một smoke; Combined giữ những vùng không bị NMS loại. Ở mẫu smoke, YOLO không có detection nào. Đây là các ví dụ cụ thể, không phải ước lượng tỷ lệ lỗi trên toàn tập [11].
+Bảng 14  Kết quả từng mẫu trong kiểm tra tích hợp
+Mẫu và nhãn
+Traditional
+YOLO
+Combined
+AoF07738 chỉ fire
+1 smoke
+1 fire và 1 smoke
+1 fire và 2 smoke
+AoF06978 chỉ smoke
+1 smoke
+Không detection
+1 smoke
+AoF06723 nhãn rỗng
+1 smoke
+Không detection
+1 smoke
+
+Hình 23  Đối chiếu ảnh AoF07738 giữa các phương pháp
+
+Hình 24  Ví dụ khói mà YOLO chưa phát hiện trong lượt kiểm tra
+
+Hình 25  Ví dụ âm tính có cảnh báo khói từ Traditional và Combined
+
+8.9 Trường hợp nhận nhầm người và vai trò của Combined
+Trong tình huống trình hình ảnh lửa trên điện thoại, nhóm quan sát thấy Traditional có thể nhận nhầm bàn tay thành FIRE và vùng gần mặt thành SMOKE. Khi thử ba chế độ trong cùng bối cảnh, YOLO không nhận nhầm người, còn Combined vẫn giữ một số vùng sai do nhận kết quả từ Traditional. Đây là ví dụ trực quan về hạn chế của quy tắc kết hợp union.
+Giả sử một ảnh người bình thường bị Traditional báo fire còn YOLO trả về rỗng, thì Combined dạng union vẫn giữ hộp của Traditional. NMS chỉ bỏ các hộp trùng nhau, không có chức năng xác minh “đây là người”. Việc YOLO không nhận nhầm mà Combined vẫn giữ kết quả sai là hệ quả có thể suy ra từ logic.
+8.10 Điều kiện so sánh giữa các phương pháp
+Một phép so sánh công bằng phải giữ cùng manifest ảnh, cách resize, lớp mục tiêu, IoU, ngưỡng score, warmup và thiết bị. Riêng detector khói có trạng thái thì không nên tích lũy nền giữa những ảnh độc lập, không liên quan nhau, nếu mục tiêu là benchmark ảnh tĩnh. Hiện compare_models gọi module detect với use_bg_sub mặc định, trong khi GUI ở chế độ Image tắt trừ nền.
+CHƯƠNG 9 KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+9.1 Kết quả đạt được của toàn nhóm
+Nhóm đã xây dựng được một hệ thống chia module, nối phương pháp truyền thống và học sâu với giao diện desktop. Quá trình này đi từ các thuật toán riêng lẻ đến một ứng dụng có thể thao tác và kiểm thử.
+Các đóng góp kiểm chứng được qua mã gồm đầu vào thống nhất, bốn loại nguồn trên GUI, chế độ ảnh một lần, giữ tỷ lệ ảnh, xác thực weights và nhãn, NMS cùng lớp, queue giữa worker và GUI, ngắt còi khi dừng và tạo lại phiên.
+9.2 Ý nghĩa của các kết quả đánh giá
+Kết quả JSON đang lưu cho thấy nhánh YOLO lửa có Precision cao hơn nhánh lửa truyền thống trong lần đánh giá đó, nhưng Recall vẫn hạn chế. Hybrid giữ ít dự đoán hơn và có Recall thấp hơn YOLO trong bảng. Với khói, cả ví dụ thực tế lẫn kết quả lưu đều cho thấy bài toán còn khó, và chưa có cơ sở nói hệ thống nhận diện đáng tin cậy mọi loại khói.
+Combined dạng union ưu tiên giữ lại những vùng mà nhánh khác bỏ sót, nhưng cũng giữ cả FP không trùng nhau. NMS xử lý sự dư thừa về không gian, chứ không xử lý ý nghĩa của vật thể. Quy tắc năm frame loại được detection thoáng qua nhưng không loại được nhiễu ổn định kéo dài. Hai nhận xét này chỉ ra đúng chỗ cần cải tiến: chất lượng detector, chính sách fusion và logic sự kiện phải được đánh giá riêng.
+9.3 Hạn chế kỹ thuật và giới hạn triển khai
+Các hạn chế kỹ thuật đáng chú ý gồm score giữa Traditional và YOLO chưa cùng thang ý nghĩa; Combined dạng union có thể giữ vùng nhận diện sai; điều kiện tiền xử lý giữa GUI và bộ đánh giá cũ chưa hoàn toàn tương đồng. Ngoài ra, việc tải mô hình và đọc Camera IP có thể ảnh hưởng thời gian khởi động hoặc dừng phiên.
+Hệ thống nhận diện đặc trưng hình ảnh nên còn khó phân biệt lửa trên màn hình với lửa vật lý, cũng như phân biệt khói và hơi nước trong nhiều bối cảnh. Cơ chế hiện tại mới xét detection theo khung hình, chưa theo dõi đối tượng thành sự kiện xuyên suốt video.
+PHỤ LỤC A DANH MỤC MODULE VÀ CẤU HÌNH
+A.1 Các file và trách nhiệm chính
+Bảng 15  Các module thực tế
+Đường dẫn
+Vai trò
+pipeline.py
+Hợp đồng gộp và hình học
+gui/app.py
+GUI worker queue phiên
+gui/alert.py
+Counter cooldown âm thanh
+config.py data.yaml
+Cấu hình chung và dataset
+traditional/preprocess.py
+Các phép tiền xử lý
+traditional/fire_detect.py
+Luật lửa và flicker tùy chọn
+traditional/smoke_detect.py
+Khói MOG2 cạnh centroid
+eval/evaluate.py
+Metric và evaluator
+yolo/train.py
+Huấn luyện và preset
+yolo/yolo_detect.py
+Suy luận YOLO
+yolo/hybrid_detect.py
+Ứng viên và xác nhận YOLO
+report/
+Báo cáo chung và minh chứng
+Danh mục trên mô tả vị trí thực tế của các file. Thư mục dataset hay models trong bản Word cũ không phải đường dẫn chuẩn của bản hiện tại: data.yaml nằm cùng cấp với thư mục data, còn weights dùng cho suy luận ở yolo/weights/best.pt.
+A.2 Từ viết tắt và ký hiệu
+Bảng 16  Các ký hiệu và từ viết tắt
+Ký hiệu
+Diễn giải
+BGR RGB HSV
+Các cách biểu diễn màu
+ROI
+Vùng quan tâm trong ảnh
+IoU NMS
+Độ giao trên hợp và loại hộp trùng
+TP FP FN TN
+Đúng dương sai dương sai âm đúng âm
+AP mAP
+Diện tích PR và giá trị trung bình theo quy ước
+MOG2
+Mô hình nền hỗn hợp Gaussian thích nghi
+FPS
+Số frame xử lý trên giây trong cửa sổ đo
+H W
+Chiều cao và rộng ảnh
+Event Queue
+Cờ hủy và hàng đợi đồng bộ
+Union Cascade
+Phép hợp kết quả và chuỗi xác nhận ứng viên
+PHỤ LỤC B MÃ NGUỒN MINH HỌA
+B.1 Kiểm tra hợp đồng kết quả detector
+Hình dưới là đoạn trích từ pipeline.py ở phiên bản khảo sát. Hàm nhận danh sách detection và shape của ảnh, kiểm tra nhãn, miền số và clipping, đồng thời bỏ những hộp không có diện tích. Hàm không điều chỉnh confidence threshold. Khi một module trả dữ liệu sai hợp đồng, việc ném lỗi giúp GUI hiển thị lỗi tích hợp thay vì để một đối tượng không hợp lệ trở thành cảnh báo.
+pipeline.py  hàm filter_detections  dòng 46 đến 65
+
+Kiểm tra đầu ra chung trước khi gộp và vẽ
+B.2 Xử lý tọa độ ảnh
+prepare_frame trả về mảng ảnh NumPy theo thứ tự kênh BGR cùng bộ tham số biến đổi. detect_frame áp phép biến đổi ngược cho từng hộp rồi kiểm tra lại theo kích thước ảnh gốc.
+pipeline.py  hàm prepare_frame  dòng 141 đến 151
+
+Letterbox và lưu tỉ lệ thực tế sau làm tròn
+pipeline.py  hàm detect_frame  dòng 154 đến 160
+
+Ánh xạ hộp từ vùng suy luận về ảnh gốc
+B.3 Thuật toán lửa truyền thống
+detect_fire là chuỗi luật màu, morphology và hình học truyền thống. Tham số tùy biến được ghép lên PARAMS nên script ablation chỉ cần đổi một nhóm biến mà không phải chép lại thuật toán. 
+traditional/fire_detect.py  hàm detect_fire  dòng 61 đến 83
+
+Phát hiện lửa truyền thống truyền thống
+B.4 Quy tắc cảnh báo thuộc hệ thống tích hợp
+update đồng bộ trạng thái bằng RLock, còn stop đánh dấu instance ngừng hoạt động và có thể ngắt kênh âm thanh của chính instance đó. Hai hàm được trình bày cùng nhau vì lỗi cuộc đua thường chỉ lộ ra khi xét cả hai đường đi.
+gui/alert.py  hàm update  dòng 31 đến 48
+
+Đếm frame và kiểm tra cooldown
+gui/alert.py  hàm stop  dòng 50 đến 64
+
+Ngắt âm thanh và vô hiệu hóa instance
+
+
+
+
+
+TÀI LIỆU THAM KHẢO
+[1] OpenCV, “Changing Colorspaces,” OpenCV-Python Tutorials. 
+Available: https://docs.opencv.org/4.x/df/d9d/tutorial_py_colorspaces.html. 
+[2] OpenCV, “Morphological Transformations,” OpenCV-Python Tutorials. Available: https://docs.opencv.org/4.x/d9/d61/tutorial_py_morphological_ops.html. 
+[3] OpenCV, “How to Use Background Subtraction Methods,” OpenCV Tutorials. Available: https://docs.opencv.org/4.x/d1/dc5/tutorial_background_subtraction.html. 
+[4] J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, “You Only Look Once: Unified, Real-Time Object Detection,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR), 2016, pp. 779–788. Available: https://arxiv.org/abs/1506.02640.
+[5] Ultralytics, “Explore Ultralytics YOLOv8,” Ultralytics Documentation. Available: https://docs.ultralytics.com/models/yolov8/. 
+[6] Ultralytics, “Model Training with Ultralytics YOLO,” Ultralytics Documentation. Available: https://docs.ultralytics.com/modes/train/. 
+[7] Ultralytics, “Model Prediction with Ultralytics YOLO,” Ultralytics Documentation. Available: https://docs.ultralytics.com/modes/predict/. 
+[8] Nhóm thực hiện, mã nguồn gui/alert.py và config.py, workspace Fire & Smoke Detection.
+[9] Nhóm thực hiện, data/LABELING_GUIDE.md và data.yaml, workspace Fire & Smoke Detection.
+[10] Nhóm thực hiện, report/comparison_summary.json; eval/ablation_pre.csv; eval/ablation_filter.csv, kết quả lưu trong workspace.
+[11] Nhóm thực hiện, report/nhom4tv_work/image_predictions.json và các ảnh sample_fire.png, sample_smoke.png, sample_negative.png.
+[12] OpenCV, “Smoothing Images,” OpenCV-Python Tutorials. Available: https://docs.opencv.org/4.x/d4/d13/tutorial_py_filtering.html.
